@@ -1,0 +1,54 @@
+Guía para la estructura del TP:
+✅ Completo
+❌ Incompleto
+⚠️ Verificar
+
+‣ ÍTEM 1:
+# agregá 
+
+- 
+- 
+
+‣ ÍTEM 2:
+
+- Mostrar plantel completo de equipo ingresado por consola (falta mejorar) ✅
+。Nota: No se muestran los planteles correctamente. 
+Hay que recordar que el llamado a la API se realiza ingresando el id del equipo.
+
+- Listar todos los equipos de la liga ✅
+- Mostrar imágen de jugadores del plantel (podríamos no hacerlo, sería un detalle) ❌
+
+‣ ÍTEM 3:
+
+- Mostrar la tabla de posiciones ingresando un año ✅
+- Obtener información temporadas (desde 2015 a 2022)✅
+
+‣ ÍTEM 4:
+
+- Infomación general de equipos ✅
+- Permitir ingreso de equipo y mostrar datos ✅
+- Mostrar imágenes de estadio y escudo ✅
+
+‣ ÍTEM 5:
+
+- Gráfico que muestre los goles y los minutos en los que fueron realizados, para equipo ingresado por consola. ✅
+。Nota: eje x = minutos jugados, eje y = goles realizados
+Podríamos también utilizar Matplotlib para realizar el gráfico. 
+
+‣ ÍTEM 6:
+
+- Permitir carga de dinero en su cuenta ✅
+
+‣ ÍTEM 7:
+
+- Mostrar el usuario que más dinero apostó ❌
+
+‣ ÍTEM 8:
+
+- Mostrar el usuario que más veces ganó ❌
+
+‣ ÍTEM 9:
+- Registrar apuestas o ingresos de dineros en archivo CSV, "transacciones.csv" ❌
+-  Respetar el formato solicitado ❌
+
+‣ PAGOS DE APUESTA POR EQUIPO:
