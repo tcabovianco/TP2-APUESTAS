@@ -5,6 +5,8 @@ import os
 from PIL import Image
 from passlib.hash import sha256_crypt
 import matplotlib.pyplot as plt
+import random
+import datetime
 
 
 def opcionesMenu() -> None:
@@ -35,6 +37,7 @@ def pedirOpcion(opciones: list) -> int:
 def registrarse() -> None:
     #Esta funcion permite al usuario registrarse, guardando sus datos en el archivo "usuarios.csv"
     registrarIdUser = str(input("Mail: "))
+    registrarIdUser = validarMail(registrarIdUser)
     registrarUsername = str(input("Usuario: "))
     registrarPassword = str(input("Contraseña: "))
     hashPassword = sha256_crypt.hash(registrarPassword)
@@ -68,6 +71,17 @@ def id_invalido(id_equipo):
         id_equipo = input("ID inválida, por favor intente nuevamente: ")    
     id_equipo = int(id_equipo)
     return id_equipo
+
+def validarMail(mail):
+    while mail.endswith(".com") != True:
+        mail = str(input("\nMail inválido, debe usar \"@\" y terminar con \".com\": "))
+        mail.endswith(".com")
+    mail = list(mail)
+    while "@" not in mail:
+        mail = str(input("\nMail inválido, debe usar \"@\" y terminar con \".com\": "))
+        mail = list(mail)
+    mail = "".join(mail)
+    return mail
 
 def obtener_plantel_equipo(equipo_id):
     conn = http.client.HTTPSConnection("v3.football.api-sports.io")
@@ -249,18 +263,122 @@ def mostrar_grafico():
     plt.show()
     os.remove(f"equipo_{equipo_id}.json") #Nota: elimina el archivo para no ocupar memoria (tuve que eliminar el file_path para que no quede una carpeta vacía. Pero si querés lo vuelvo a agregar -hice una copia-)
 
-def cargarDinero(idUser, datosTotales) -> None:
+def cargarDinero(idUser, datosTotales, monto) -> None:
     #Añade dinero a la cuenta del usuario
-    monto = input("Ingrese el monto que desea agregar: ")
-    while numero_invalido(monto):
-        monto = input("\nMonto inválido, intente nuevamente: ")
-    print()
-    monto = int(monto)
     for lista in datosTotales.values():
         if idUser == lista[0]:
-            lista[5] = int(lista[5])
+            lista[5] = float(lista[5])
             lista[5] += monto
             print("Monto agregado con éxito!")
+            os.remove("usuarios.csv")
+            with open("usuarios.csv", "a") as file:
+                for usuario in datosTotales.values():
+                    for datos in usuario:
+                        file.write(f"{datos},")
+                    file.write("\n")
+
+def apuestas(equipoId, idUser, datosTotales, montoDisponible):
+    with open("fixtures.json", "r") as json_file:
+        json_file = json.load(json_file)
+    fixtures = []
+    for elemento in json_file["response"]:
+        if elemento["teams"]["home"]["id"] == equipoId or elemento["teams"]["away"]["id"] == equipoId:
+            fixtures.append(elemento["fixture"]["id"])
+    
+    print("\nEliga una ID para ingresar al partido que desea apostar")
+    for fixture in fixtures:
+        for elemento in json_file["response"]:
+            if fixture == elemento["fixture"]["id"]:
+                print(f"\n+---+ ID: {fixture} +---+")
+                print(f"Local: {elemento['teams']['home']['name']}\nVisitante: {elemento['teams']['away']['name']}")
+
+    elegirId = input("\nElegir ID: ")
+    while numero_invalido(elegirId) or int(elegirId) not in fixtures:
+        elegirId = input("ID inválida, intente nuevamente: ")
+    
+    conn = http.client.HTTPSConnection("v3.football.api-sports.io")
+
+    headers = {
+        'x-rapidapi-host': "v3.football.api-sports.io",
+        'x-rapidapi-key': "3acf8ad408e18c67e1da7a3a32ea624b"
+        }
+
+    conn.request("GET", f"/predictions?fixture={elegirId}", headers=headers)
+    res = conn.getresponse()
+    data = res.read().decode("utf-8")
+
+    with open(f"fixture_{elegirId}.json", "w") as jsonFile:
+        jsonFile.write(data)
+
+    with open(f"fixture_{elegirId}.json", "r") as jsonFile:
+        dataJson = json.load(jsonFile)
+
+    posiblesResultados = ["Ganador(L)", "Empate", "Ganador(V)"]
+    apostarResultado = input("\nIngrese el resultado esperado /Ganador(L)/Empate/Ganador(V)/: ")
+    if apostarResultado not in posiblesResultados:
+        apostarResultado = input("Resultado inválido, intente nuevamente /Ganador(L)/Empate/Ganador(V)/: ")
+
+    apostarMonto = input("\nIngrese el monto que desea apostar: ")
+    while numero_invalido(apostarMonto):
+        apostarMonto = input("\nMonto inválido, intente nuevamente: ")
+    apostarMonto = float(apostarMonto)
+    if apostarMonto > montoDisponible:
+        print("\nUsted no cuenta con ese dinero en su cuenta")
+        return None
+
+    dado = random.randint(1,3)
+    if dado == 1:
+        resultado = "Ganador(L)"
+    elif dado == 2:
+        resultado = "Empate"
+    elif dado == 3:
+        resultado = "Ganador(V)"
+
+    win_or_draw = dataJson["response"][0]["predictions"]["win_or_draw"]
+
+    n = random.randint(1,4)
+
+    if resultado in ["Ganador(L)", "Ganador(V)"]:
+        if apostarResultado == resultado and win_or_draw == True:
+            paga = apostarMonto*n*0.1
+            print(f"\n{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
+        elif apostarResultado == resultado and win_or_draw == False:
+            paga = apostarMonto*n
+            print(f"\n{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
+        elif apostarResultado != resultado and win_or_draw == True:
+            paga = 0
+            print(f"\nHa ganado: {resultado}\nSuerte para la próxima!")
+        elif apostarResultado != resultado and win_or_draw == False:
+            paga = 0
+            print(f"\nHa ganado: {resultado}\nSuerte para la próxima!")
+    else:
+        if win_or_draw == True:
+            paga = apostarMonto*n*0.05
+            print(f"\n{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
+        elif win_or_draw == False:
+            paga = apostarMonto*n
+            print(f"\n{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
+
+    añoApuesta = datetime.datetime.now().year
+    mesApuesta = datetime.datetime.now().month
+    diaApuesta = datetime.datetime.now().day
+    fechaApuesta = f"{añoApuesta}" + f"{mesApuesta}" + f"{diaApuesta}"
+    for lista in datosTotales.values():
+        if idUser == lista[0]:
+            lista[5] = float(lista[5])
+            lista[5] += paga
+            lista[4] = fechaApuesta
+            lista[3] = float(lista[3])
+            lista[3] += apostarMonto
+            os.remove("usuarios.csv")
+            with open("usuarios.csv", "a") as file:
+                for usuario in datosTotales.values():
+                    for datos in usuario:
+                        file.write(f"{datos},")
+                    file.write("\n")
+    os.remove(f"fixture_{elegirId}.json")
+
+    #Crear el archivo transacciones.csv con los resultados
 
 def main() -> None:
     opcionesMenu()
@@ -311,7 +429,12 @@ def main() -> None:
                                 opciones()
                                 opcion = pedirOpcion(["1","2","3","4","5","6","7","8","9"])
                             elif opcion == 5:
-                                cargarDinero(lista[0], datosTotales)
+                                monto = input("Ingrese el monto que desea agregar: ")
+                                while numero_invalido(monto):
+                                    monto = input("\nMonto inválido, intente nuevamente: ")
+                                monto = float(monto)
+                                print()
+                                cargarDinero(lista[0], datosTotales, monto)
                                 opciones()
                                 opcion = pedirOpcion(["1","2","3","4","5","6","7","8","9"])
                             elif opcion == 6:
@@ -323,18 +446,22 @@ def main() -> None:
                                 opciones()
                                 opcion = pedirOpcion(["1","2","3","4","5","6","7","8","9"])
                             elif opcion == 8:
-                                pass
+                                imprimir_ids_equipos()
+                                equipoId = input("\nIngrese el ID del equipo: ")
+                                equipoId = id_invalido(equipoId)
+                                lista[5] = float(lista[5])
+                                apuestas(equipoId, lista[0], datosTotales, lista[5])
                                 opciones()
                                 opcion = pedirOpcion(["1","2","3","4","5","6","7","8","9"])
                         if opcion == 9:
                             opcionesMenu()
                             opcionMenu = pedirOpcion(["1","2","3"])
                             break
-                else:
-                    print("\nLa contraseña es incorrecta")
-                    opcionesMenu()
-                    opcionMenu = pedirOpcion(["1","2","3"])
-                    break
+                    else:
+                        print("\nLa contraseña es incorrecta")
+                        opcionesMenu()
+                        opcionMenu = pedirOpcion(["1","2","3"])
+                        break
             else:
                 print("\nEste usuario no se ha registrado")
                 opcionesMenu()
