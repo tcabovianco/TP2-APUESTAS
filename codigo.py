@@ -6,6 +6,7 @@ from PIL import Image
 from passlib.hash import sha256_crypt
 import matplotlib.pyplot as plt
 import random
+import datetime
 
 
 def opcionesMenu() -> None:
@@ -262,28 +263,21 @@ def mostrar_grafico():
     plt.show()
     os.remove(f"equipo_{equipo_id}.json") #Nota: elimina el archivo para no ocupar memoria (tuve que eliminar el file_path para que no quede una carpeta vacía. Pero si querés lo vuelvo a agregar -hice una copia-)
 
-def cargarDinero(idUser, datosTotales) -> None:
+def cargarDinero(idUser, datosTotales, monto) -> None:
     #Añade dinero a la cuenta del usuario
-    monto = input("Ingrese el monto que desea agregar: ")
-    while numero_invalido(monto):
-        monto = input("\nMonto inválido, intente nuevamente: ")
-    monto = int(monto)
-    print()
     for lista in datosTotales.values():
         if idUser == lista[0]:
-            lista[5] = int(lista[5])
+            lista[5] = float(lista[5])
             lista[5] += monto
             print("Monto agregado con éxito!")
             os.remove("usuarios.csv")
-            with open("usuarios.csv", "a") as file: #Para modificar el diccionario con el dinero que tiene cada usuario
+            with open("usuarios.csv", "a") as file:
                 for usuario in datosTotales.values():
                     for datos in usuario:
                         file.write(f"{datos},")
                     file.write("\n")
-            #Nota: Mejorar en lo posible
-            #Nota 2: Creo que tambien hay que registrar cuando se agrega dinero en "transacciones.csv"
 
-def apuestas(equipoId, idUser, montoDisponible):
+def apuestas(equipoId, idUser, datosTotales, montoDisponible):
     with open("fixtures.json", "r") as json_file:
         json_file = json.load(json_file)
     fixtures = []
@@ -327,9 +321,10 @@ def apuestas(equipoId, idUser, montoDisponible):
     apostarMonto = input("\nIngrese el monto que desea apostar: ")
     while numero_invalido(apostarMonto):
         apostarMonto = input("\nMonto inválido, intente nuevamente: ")
-    apostarMonto = int(apostarMonto)
-    
-    #Verificar que el monto a apostar sea menor al disponible
+    apostarMonto = float(apostarMonto)
+    if apostarMonto > montoDisponible:
+        print("\nUsted no cuenta con ese dinero en su cuenta")
+        return None
 
     dado = random.randint(1,3)
     if dado == 1:
@@ -340,35 +335,50 @@ def apuestas(equipoId, idUser, montoDisponible):
         resultado = "Ganador(V)"
 
     win_or_draw = dataJson["response"][0]["predictions"]["win_or_draw"]
-    print(resultado, win_or_draw) #Borrar
 
-    #Paga:
     n = random.randint(1,4)
 
     if resultado in ["Ganador(L)", "Ganador(V)"]:
-        if apostarResultado == resultado and win_or_draw == True: #Si apostaste por esto ganas el %10
+        if apostarResultado == resultado and win_or_draw == True:
             paga = apostarMonto*n*0.1
-            print(0) #Borrar
-        elif apostarResultado == resultado and win_or_draw == False: #Si apostaste por esto ganas n veces lo apostado
+            print(f"\n{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
+        elif apostarResultado == resultado and win_or_draw == False:
             paga = apostarMonto*n
-            print(1) #Borrar
+            print(f"\n{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
         elif apostarResultado != resultado and win_or_draw == True:
             paga = 0
-            print(2) #Borrar
+            print(f"\nHa ganado: {resultado}\nSuerte para la próxima!")
         elif apostarResultado != resultado and win_or_draw == False:
             paga = 0
-            print(3) #Borrar
+            print(f"\nHa ganado: {resultado}\nSuerte para la próxima!")
     else:
-        if apostarResultado == resultado and win_or_draw == True:
-            paga = apostarMonto*n*0.05 #Empate
-            print(4) #Borrar
-        elif apostarResultado == resultado and win_or_draw == False:
-            paga = apostarMonto*n #Empate
-            print(5) #Borrar
+        if win_or_draw == True:
+            paga = apostarMonto*n*0.05
+            print(f"\n{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
+        elif win_or_draw == False:
+            paga = apostarMonto*n
+            print(f"\n{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
 
-    #Notas: faltaria validar el saldo disponible, y crear el archivo transacciones.csv con los resultados
+    añoApuesta = datetime.datetime.now().year
+    mesApuesta = datetime.datetime.now().month
+    diaApuesta = datetime.datetime.now().day
+    fechaApuesta = f"{añoApuesta}" + f"{mesApuesta}" + f"{diaApuesta}"
+    for lista in datosTotales.values():
+        if idUser == lista[0]:
+            lista[5] = float(lista[5])
+            lista[5] += paga
+            lista[4] = fechaApuesta
+            lista[3] = float(lista[3])
+            lista[3] += apostarMonto
+            os.remove("usuarios.csv")
+            with open("usuarios.csv", "a") as file:
+                for usuario in datosTotales.values():
+                    for datos in usuario:
+                        file.write(f"{datos},")
+                    file.write("\n")
     os.remove(f"fixture_{elegirId}.json")
 
+    #Crear el archivo transacciones.csv con los resultados
 
 def main() -> None:
     opcionesMenu()
@@ -419,7 +429,12 @@ def main() -> None:
                                 opciones()
                                 opcion = pedirOpcion(["1","2","3","4","5","6","7","8","9"])
                             elif opcion == 5:
-                                cargarDinero(lista[0], datosTotales)
+                                monto = input("Ingrese el monto que desea agregar: ")
+                                while numero_invalido(monto):
+                                    monto = input("\nMonto inválido, intente nuevamente: ")
+                                monto = float(monto)
+                                print()
+                                cargarDinero(lista[0], datosTotales, monto)
                                 opciones()
                                 opcion = pedirOpcion(["1","2","3","4","5","6","7","8","9"])
                             elif opcion == 6:
@@ -434,7 +449,8 @@ def main() -> None:
                                 imprimir_ids_equipos()
                                 equipoId = input("\nIngrese el ID del equipo: ")
                                 equipoId = id_invalido(equipoId)
-                                apuestas(equipoId, lista[0], lista[5])
+                                lista[5] = float(lista[5])
+                                apuestas(equipoId, lista[0], datosTotales, lista[5])
                                 opciones()
                                 opcion = pedirOpcion(["1","2","3","4","5","6","7","8","9"])
                         if opcion == 9:
