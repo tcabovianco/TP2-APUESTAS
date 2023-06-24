@@ -93,11 +93,11 @@ def validarMail(mail: str) -> str:
     #Valida que el valor ingresado contenga ".com" y "@"
 
     while mail.endswith(".com") != True:
-        mail = str(input("Mail inválido, debe usar \"@\" y terminar con \".com\": "))
+        mail = input("Mail inválido, debe usar \"@\" y terminar con \".com\": ")
         mail.endswith(".com")
     mail = list(mail)
     while "@" not in mail:
-        mail = str(input("Mail inválido, debe usar \"@\" y terminar con \".com\": "))
+        mail = input("Mail inválido, debe usar \"@\" y terminar con \".com\": ")
         mail = list(mail)
     mail = "".join(mail)
     return mail
