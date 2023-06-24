@@ -93,11 +93,11 @@ def validarMail(mail: str) -> str:
     #Valida que el valor ingresado contenga ".com" y "@"
 
     while mail.endswith(".com") != True:
-        mail = str(input("Mail inválido, debe usar \"@\" y terminar con \".com\": "))
+        mail = input("Mail inválido, debe usar \"@\" y terminar con \".com\": ")
         mail.endswith(".com")
     mail = list(mail)
     while "@" not in mail:
-        mail = str(input("Mail inválido, debe usar \"@\" y terminar con \".com\": "))
+        mail = input("Mail inválido, debe usar \"@\" y terminar con \".com\": ")
         mail = list(mail)
     mail = "".join(mail)
     return mail
@@ -353,6 +353,17 @@ def cargarDinero(idUser: int, datosTotales: list, monto: float) -> None:
                     f.write("\n")
             with open("transacciones.csv", "a") as fT:
                 fT.write(f"{idUser},{fechaDeposita},Deposita,{monto}\n")
+
+def mayorApostador(datosTotales: list) -> None:
+    montoApostado = 0
+    montoApostado = float(montoApostado)
+    for datos in datosTotales.values():
+        datos[3] = float(datos[3])
+        if datos[3] > montoApostado:
+            montoApostado = datos[3]
+            user = datos[1]
+    return user, montoApostado
+
 
 def tirar_dados() -> int:
     #Función que define el resultado del partido
@@ -644,7 +655,8 @@ def main() -> None:
                                     opcion = pedirOpcion(OPCIONES)
 
                                 elif opcion == 6:
-                                    pass
+                                    user, montoApostado = mayorApostador(datosTotales)
+                                    print(f"El usuario que más apostó fue {user}. Con un total de {montoApostado}!")
 
                                     opciones()
                                     opcion = pedirOpcion(OPCIONES)
