@@ -48,7 +48,7 @@ Podríamos también utilizar Matplotlib para realizar el gráfico.
 - Mostrar el usuario que más veces ganó ❌
 
 ‣ ÍTEM 9:
-- Registrar apuestas o ingresos de dineros en archivo CSV, "transacciones.csv" ❌
--  Respetar el formato solicitado ❌
+- Registrar apuestas o ingresos de dineros en archivo CSV, "transacciones.csv" ✅
+-  Respetar el formato solicitado ✅
 
 ‣ PAGOS DE APUESTA POR EQUIPO:
