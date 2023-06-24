@@ -7,7 +7,7 @@ from passlib.hash import sha256_crypt
 import matplotlib.pyplot as plt
 import random
 import datetime
-
+import termcolor
 
 def opcionesMenu() -> None:
     print("\n+-----+ Menú +-----+")
