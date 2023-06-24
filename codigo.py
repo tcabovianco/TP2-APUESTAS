@@ -265,6 +265,10 @@ def mostrar_grafico():
 
 def cargarDinero(idUser, datosTotales, monto) -> None:
     #Añade dinero a la cuenta del usuario
+    añoDeposita = datetime.datetime.now().year
+    mesDeposita = datetime.datetime.now().month
+    diaDeposita = datetime.datetime.now().day
+    fechaDeposita = f"{añoDeposita}" + f"{mesDeposita}" + f"{diaDeposita}"
     for lista in datosTotales.values():
         if idUser == lista[0]:
             lista[5] = float(lista[5])
@@ -276,8 +280,11 @@ def cargarDinero(idUser, datosTotales, monto) -> None:
                     for datos in usuario:
                         file.write(f"{datos},")
                     file.write("\n")
+            with open("transacciones.csv", "a") as fileTransacciones:
+                fileTransacciones.write(f"{idUser},{fechaDeposita},Deposita,{monto}\n")
 
-def apuestas(equipoId, idUser, datosTotales, montoDisponible):
+
+def apostar(equipoId, idUser, datosTotales, montoDisponible):
     with open("fixtures.json", "r") as json_file:
         json_file = json.load(json_file)
     fixtures = []
@@ -313,8 +320,25 @@ def apuestas(equipoId, idUser, datosTotales, montoDisponible):
     with open(f"fixture_{elegirId}.json", "r") as jsonFile:
         dataJson = json.load(jsonFile)
 
+    win_or_draw = dataJson["response"][0]["predictions"]["win_or_draw"]
+    local = dataJson["response"][0]["teams"]["home"]
+    visitante = dataJson["response"][0]["teams"]["away"]
+
+    if elegirId == local["id"] and win_or_draw == True:
+        print(f"\nSi apostas por {local['name']}, se paga el %10 de lo que paga la apuesta")
+        print(f"Si apostas por {visitante['name']}, se paga el %100 de lo que paga la apuesta")
+    elif elegirId == local["id"] and win_or_draw == False:
+        print(f"\nSi apostas por {visitante['name']}, se paga el %10 de lo que paga la apuesta")
+        print(f"Si apostas por {local['name']}, se paga el %100 de lo que paga la apuesta")
+    elif elegirId != local["id"] and win_or_draw == True:
+        print(f"\nSi apostas por {visitante['name']}, se paga el %10 de lo que paga la apuesta")
+        print(f"Si apostas por {local['name']}, se paga el %100 de lo que paga la apuesta")
+    elif elegirId != local["id"] and win_or_draw == False:
+        print(f"\nSi apostas por {local['name']}, se paga el %10 de lo que paga la apuesta")
+        print(f"Si apostas por {visitante['name']}, se paga el %100 de lo que paga la apuesta")
+
     posiblesResultados = ["Ganador(L)", "Empate", "Ganador(V)"]
-    apostarResultado = input("\nIngrese el resultado esperado /Ganador(L)/Empate/Ganador(V)/: ")
+    apostarResultado = input("\nIngrese el resultado esperado para el equipo que eligio /Ganador(L)/Empate/Ganador(V)/: ")
     if apostarResultado not in posiblesResultados:
         apostarResultado = input("Resultado inválido, intente nuevamente /Ganador(L)/Empate/Ganador(V)/: ")
 
@@ -322,9 +346,13 @@ def apuestas(equipoId, idUser, datosTotales, montoDisponible):
     while numero_invalido(apostarMonto):
         apostarMonto = input("\nMonto inválido, intente nuevamente: ")
     apostarMonto = float(apostarMonto)
-    if apostarMonto > montoDisponible:
-        print("\nUsted no cuenta con ese dinero en su cuenta")
-        return None
+    if apostarMonto > montoDisponible or apostarMonto <= 0:
+        if apostarMonto > montoDisponible:
+            print("\nUsted no cuenta con ese monto en su cuenta")
+            return None
+        else:
+            print("\nEse monto no es posible de apostar")
+            return None
 
     dado = random.randint(1,3)
     if dado == 1:
@@ -334,30 +362,42 @@ def apuestas(equipoId, idUser, datosTotales, montoDisponible):
     elif dado == 3:
         resultado = "Ganador(V)"
 
-    win_or_draw = dataJson["response"][0]["predictions"]["win_or_draw"]
-
     n = random.randint(1,4)
 
     if resultado in ["Ganador(L)", "Ganador(V)"]:
         if apostarResultado == resultado and win_or_draw == True:
-            paga = apostarMonto*n*0.1
+            paga = apostarMonto + apostarMonto*n*0.1
+            resultadoFinal = "Gana"
             print(f"\n{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
         elif apostarResultado == resultado and win_or_draw == False:
-            paga = apostarMonto*n
+            paga = apostarMonto + apostarMonto*n
+            resultadoFinal = "Gana"
             print(f"\n{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
         elif apostarResultado != resultado and win_or_draw == True:
-            paga = 0
-            print(f"\nHa ganado: {resultado}\nSuerte para la próxima!")
+            paga = -apostarMonto
+            resultadoFinal = "Pierde"
+            print(f"\nResultado: {resultado}\nSuerte para la próxima!")
         elif apostarResultado != resultado and win_or_draw == False:
-            paga = 0
-            print(f"\nHa ganado: {resultado}\nSuerte para la próxima!")
+            paga = -apostarMonto
+            resultadoFinal = "Pierde"
+            print(f"\nResultado: {resultado}\nSuerte para la próxima!")
     else:
-        if win_or_draw == True:
-            paga = apostarMonto*n*0.05
+        if apostarResultado == resultado and win_or_draw == True:
+            paga = apostarMonto + apostarMonto*n*0.05
+            resultadoFinal = "Gana"
             print(f"\n{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
-        elif win_or_draw == False:
-            paga = apostarMonto*n
+        elif apostarResultado == resultado and win_or_draw == False:
+            paga = apostarMonto + apostarMonto*n
+            resultadoFinal = "Gana"
             print(f"\n{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
+        elif apostarResultado != resultado and win_or_draw == True:
+            paga = -apostarMonto
+            resultadoFinal = "Pierde"
+            print(f"\nResultado: {resultado}\nSuerte para la próxima!")
+        elif apostarResultado != resultado and win_or_draw == False:
+            paga = -apostarMonto
+            resultadoFinal = "Pierde"
+            print(f"\nResultado: {resultado}\nSuerte para la próxima!")
 
     añoApuesta = datetime.datetime.now().year
     mesApuesta = datetime.datetime.now().month
@@ -378,7 +418,8 @@ def apuestas(equipoId, idUser, datosTotales, montoDisponible):
                     file.write("\n")
     os.remove(f"fixture_{elegirId}.json")
 
-    #Crear el archivo transacciones.csv con los resultados
+    with open("transacciones.csv", "a") as fileTransacciones:
+        fileTransacciones.write(f"{idUser},{fechaApuesta},{resultadoFinal},{paga}\n")
 
 def main() -> None:
     opcionesMenu()
@@ -450,7 +491,7 @@ def main() -> None:
                                 equipoId = input("\nIngrese el ID del equipo: ")
                                 equipoId = id_invalido(equipoId)
                                 lista[5] = float(lista[5])
-                                apuestas(equipoId, lista[0], datosTotales, lista[5])
+                                apostar(equipoId, lista[0], datosTotales, lista[5])
                                 opciones()
                                 opcion = pedirOpcion(["1","2","3","4","5","6","7","8","9"])
                         if opcion == 9:
