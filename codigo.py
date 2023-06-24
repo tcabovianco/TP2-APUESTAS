@@ -16,7 +16,9 @@ def opcionesMenu() -> None:
     print("3. Salir\n")
 
 def opciones() -> None:
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
     print("\nOpciones:")
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
     print("1. Mostrar el plantel completo de un equipo")
     print("2. Mostrar la tabla de posiciones de la Liga Profesional")
     print("3. Datos de un equipo")
@@ -26,20 +28,27 @@ def opciones() -> None:
     print("7. Usuario que más veces ganó")
     print("8. Apuestas")
     print("9. Cerrar sesion\n")
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
 
 def pedirOpcion(opciones: list) -> int:
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
     opcion = input("Elegir opción: ")
     while numero_invalido(opcion) or opcion not in opciones:
         opcion = input("\nPor favor, ingrese una opción válida: ")
     opcion = int(opcion)
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
     return opcion
 
 def registrarse() -> None:
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
     #Esta funcion permite al usuario registrarse, guardando sus datos en el archivo "usuarios.csv"
     registrarIdUser = str(input("Mail: "))
     registrarIdUser = validarMail(registrarIdUser)
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
     registrarUsername = str(input("Usuario: "))
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
     registrarPassword = str(input("Contraseña: "))
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
     hashPassword = sha256_crypt.hash(registrarPassword)
     registrarCantidadApostada = 0
     registrarFechaUltimaApuesta = "No se ha realizado ninguna apuesta"
@@ -150,17 +159,20 @@ def imprimir_ids_equipos() -> None:
         "Central Cordoba de Santiago": 1065,
         "Barracas Central": 2432
     }
-
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
     print("\nA continuación se muestran los equipos y sus respectivas IDs:")
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
 
     for equipo, id_equipo in equipos.items():
         print(f"{equipo}: {id_equipo}")
-
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
+    
 def posiciones_temporada() -> None:
-    lista_años = ["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"]
-    print(f"\nLas temporadas disponibles son: 2015, 2016, 2017, 2018, 2019, 2020, 2021 y 2022")
+    lista_años = ["2015", "2016", "2017", "2018", "2019"]
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
+    print(f"\nLas temporadas disponibles son: 2015, 2016, 2017, 2018, 2019)
     año = input("Ingrese el año para ver la tabla de posiciones: ")
-    print()
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
 
     while numero_invalido(año) or año not in lista_años:
         año = input("Año inválido, intente nuevamente: ")
@@ -174,6 +186,7 @@ def posiciones_temporada() -> None:
 
     standings = data['response'][0]['league']['standings']
 
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
     for ranking in standings:
         print(ranking[0]["group"])
         for position in ranking:
@@ -183,6 +196,7 @@ def posiciones_temporada() -> None:
             goals_diff = position['goalsDiff']
             print(f"{rank}. {team}, {points} Pts, ({goals_diff})")
         print()
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
 
 def mostrarInfoEquipo(equipoId) -> None:
     with open("info equipos.json", "r") as json_file:
@@ -229,8 +243,10 @@ def mostrarInfoEquipo(equipoId) -> None:
 def mostrar_grafico():
     imprimir_ids_equipos()
     print()
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
     equipo_id = input("Ingrese el ID del equipo: ")
     equipo_id = id_invalido(equipo_id)
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
     
     conn = http.client.HTTPSConnection("v3.football.api-sports.io")
     headers = {
@@ -283,6 +299,43 @@ def cargarDinero(idUser, datosTotales, monto) -> None:
             with open("transacciones.csv", "a") as fileTransacciones:
                 fileTransacciones.write(f"{idUser},{fechaDeposita},Deposita,{monto}\n")
 
+def tirar_dados():
+    valores_dados = [
+        termcolor.colored("┌───────┐\n│       │\n│   ●   │\n│       │\n└───────┘", "magenta", attrs=["bold"]),
+        termcolor.colored("┌───────┐\n│ ●     │\n│       │\n│     ● │\n└───────┘", "magenta", attrs=["bold"]),
+        termcolor.colored("┌───────┐\n│ ●     │\n│   ●   │\n│     ● │\n└───────┘", "magenta", attrs=["bold"]),
+        termcolor.colored("┌───────┐\n│ ●   ● │\n│       │\n│ ●   ● │\n└───────┘", "magenta", attrs=["bold"]),
+        termcolor.colored("┌───────┐\n│ ●   ● │\n│   ●   │\n│ ●   ● │\n└───────┘", "magenta", attrs=["bold"]),
+        termcolor.colored("┌───────┐\n│ ●   ● │\n│ ●   ● │\n│ ●   ● │\n└───────┘", "magenta", attrs=["bold"]),
+    ]
+    respuesta = random.randint(1, 3)
+    termcolor.cprint("Se están tirando los dados para determinar el ganador...", "cyan")
+    termcolor.cprint("☘ ¡Mucha suerte! ☘", "green", attrs=["bold"])
+    termcolor.cprint("... El número es ...", "cyan")
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
+    print(valores_dados[respuesta-1])
+    termcolor.cprint(f"El número que salió en los dados es {respuesta}", "yellow", attrs=["bold"])
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
+    return respuesta
+
+def tirar_dados_2():
+    valores_dados = [
+        termcolor.colored("┌───────┐\n│       │\n│   ●   │\n│       │\n└───────┘", "magenta", attrs=["bold"]),
+        termcolor.colored("┌───────┐\n│ ●     │\n│       │\n│     ● │\n└───────┘", "magenta", attrs=["bold"]),
+        termcolor.colored("┌───────┐\n│ ●     │\n│   ●   │\n│     ● │\n└───────┘", "magenta", attrs=["bold"]),
+        termcolor.colored("┌───────┐\n│ ●   ● │\n│       │\n│ ●   ● │\n└───────┘", "magenta", attrs=["bold"]),
+        termcolor.colored("┌───────┐\n│ ●   ● │\n│   ●   │\n│ ●   ● │\n└───────┘", "magenta", attrs=["bold"]),
+        termcolor.colored("┌───────┐\n│ ●   ● │\n│ ●   ● │\n│ ●   ● │\n└───────┘", "magenta", attrs=["bold"]),
+    ]
+    respuesta = random.randint(1, 4)
+    termcolor.cprint("Se están tirando los dados para determinar su pago...", "cyan")
+    termcolor.cprint("☘ ¡Mucha suerte! ☘", "green", attrs=["bold"])
+    termcolor.cprint("... El número es ...", "cyan")
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
+    print(valores_dados[respuesta-1])
+    termcolor.cprint(f"El número que salió en los dados es {respuesta}", "yellow", attrs=["bold"])
+    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
+    return respuesta
 
 def apostar(equipoId, idUser, datosTotales, montoDisponible):
     with open("fixtures.json", "r") as json_file:
@@ -354,7 +407,7 @@ def apostar(equipoId, idUser, datosTotales, montoDisponible):
             print("\nEse monto no es posible de apostar")
             return None
 
-    dado = random.randint(1,3)
+    dado = tirar_dados()
     if dado == 1:
         resultado = "Ganador(L)"
     elif dado == 2:
@@ -362,7 +415,7 @@ def apostar(equipoId, idUser, datosTotales, montoDisponible):
     elif dado == 3:
         resultado = "Ganador(V)"
 
-    n = random.randint(1,4)
+    n = tirar_dados_2 ()
 
     if resultado in ["Ganador(L)", "Ganador(V)"]:
         if apostarResultado == resultado and win_or_draw == True:
