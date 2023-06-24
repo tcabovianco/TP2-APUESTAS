@@ -169,24 +169,36 @@ def imprimir_ids_equipos() -> None:
     
 def posiciones_temporada() -> None:
     lista_años = ["2015", "2016", "2017", "2018", "2019"]
-    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
-    print(f"\nLas temporadas disponibles son: 2015, 2016, 2017, 2018, 2019)
+    termcolor.cprint("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
+    print("\nLas temporadas disponibles son: 2015, 2016, 2017, 2018, 2019")
     año = input("Ingrese el año para ver la tabla de posiciones: ")
-    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
+    termcolor.cprint("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
 
-    while numero_invalido(año) or año not in lista_años:
+    while año not in lista_años:
         año = input("Año inválido, intente nuevamente: ")
         print()
 
-    año = int(año)
+    conn = http.client.HTTPSConnection("v3.football.api-sports.io")
+    headers = {
+        'x-rapidapi-host': "v3.football.api-sports.io",
+        'x-rapidapi-key': "c58299203753a8108c210738ab6b68a5"
+    }
+
+    conn.request("GET", f"/standings?league=128&season={año}", headers=headers)
+    res = conn.getresponse()
+    data = res.read()
+
     archivo = f"posicion {año}.json"
+
+    with open(f"Tabla de posiciones/{archivo}", 'wb') as json_file:
+        json_file.write(data)
 
     with open(f"Tabla de posiciones/{archivo}", 'r') as json_file:
         data = json.load(json_file)
 
     standings = data['response'][0]['league']['standings']
 
-    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
+    termcolor.cprint("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
     for ranking in standings:
         print(ranking[0]["group"])
         for position in ranking:
@@ -196,11 +208,31 @@ def posiciones_temporada() -> None:
             goals_diff = position['goalsDiff']
             print(f"{rank}. {team}, {points} Pts, ({goals_diff})")
         print()
-    termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
+    termcolor.cprint("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
 
 def mostrarInfoEquipo(equipoId) -> None:
-    with open("info equipos.json", "r") as json_file:
+    conn = http.client.HTTPSConnection("v3.football.api-sports.io")
+
+    headers = {
+        'x-rapidapi-host': "v3.football.api-sports.io",
+        'x-rapidapi-key': "c58299203753a8108c210738ab6b68a5"
+    }
+
+    conn.request("GET", "/teams?league=128&season=2023", headers=headers)
+
+    res = conn.getresponse()
+    data = res.read()
+
+    data_decoded = data.decode("utf-8")
+
+    file_path = "info_equipos.json"
+    with open(file_path, "w") as json_file:
+        json_file.write(data_decoded)
+
+    print("Datos guardados en el archivo JSON:", file_path)
+    with open(file_path, "r") as json_file:
         data_loaded = json.load(json_file)
+    
     info_json = data_loaded["response"]
     for info in info_json:
         if info['team']['id'] == equipoId:
@@ -215,27 +247,32 @@ def mostrarInfoEquipo(equipoId) -> None:
             capacidadEstadio = info['venue']['capacity']
             superficieEstadio = info['venue']['surface']
             imagenEstadio = info['venue']['image']
+            
             print(f"+-----+ Información básica sobre el equipo {nombreEquipo} +-----+")
             print(f"Codigo: {codigoEquipo}\tPaís de origen: {paisEquipo}\tAño de fundación: {fundacionEquipo}")
-            #Mostrar logoEquipo
+            
+            # Mostrar logoEquipo
             print("\nCargando imagen...")
-            r = requests.get(logoEquipo) 
-            with open(f'logoEquipo{nombreEquipo}.png', 'wb') as f: 
+            r = requests.get(logoEquipo)
+            with open(f'logoEquipo{nombreEquipo}.png', 'wb') as f:
                 f.write(r.content)
             imagen = Image.open(f'logoEquipo{nombreEquipo}.png')
             imagen.show()
-            os.remove(f'logoEquipo{nombreEquipo}.png') #Nota: elimina la imagen para no ocupar memoria
+            os.remove(f'logoEquipo{nombreEquipo}.png')  # Nota: elimina la imagen para no ocupar memoria
+            
             print("\n+-----+ Información sobre su estadio +-----+")
             print(f"Nombre: {nombreEstadio}\tDirección: {direccionEstadio}")
             print(f"Ciudad: {ciudadEstadio}\tCapacidad: {capacidadEstadio}\tSuperficie: {superficieEstadio}")
-            #Mostrar imagenEstadio
+            
+            # Mostrar imagenEstadio
             print("\nCargando imagen...")
-            r = requests.get(imagenEstadio) 
-            with open(f'imagenEstadio{nombreEquipo}.png', 'wb') as f: 
+            r = requests.get(imagenEstadio)
+            with open(f'imagenEstadio{nombreEquipo}.png', 'wb') as f:
                 f.write(r.content)
             imagen = Image.open(f'imagenEstadio{nombreEquipo}.png')
             imagen.show()
-            os.remove(f'imagenEstadio{nombreEquipo}.png') #Nota: elimina la imagen para no ocupar memoria
+            os.remove(f'imagenEstadio{nombreEquipo}.png')  # Nota: elimina la imagen para no ocupar memoria
+            
             break
     else:
         print(f"\nNo se encontró información para el equipo con ID {equipoId}")
