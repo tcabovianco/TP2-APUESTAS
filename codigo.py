@@ -556,7 +556,30 @@ def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: flo
 
     os.remove(f"fixture_{elegirId}.json")
     os.remove("fixtures.json")
+    
+def obtener_usuario_mas_ganador() -> None:
+    # Obtiene el usuario más ganador a partir del archivo transacciones.
+    
+    victorias_por_usuario = {}
+    with open("transacciones.csv", "r") as fT:
+    
+        for linea in fT:
+            datos = linea.strip().split(",")
+            idUser = int(datos[0])
+            resultadoFinal = datos[2]
 
+            if resultadoFinal == "Gana":
+                if idUser in victorias_por_usuario:
+                    victorias_por_usuario[idUser] += 1
+                else:
+                    victorias_por_usuario[idUser] = 1
+
+    usuario_mas_ganador = max(victorias_por_usuario, key=victorias_por_usuario.get)
+    cantidad_victorias = victorias_por_usuario[usuario_mas_ganador]
+
+    print(f"El usuario más ganador es: {usuario_mas_ganador}")
+    print(f"Cantidad de victorias: {cantidad_victorias}")
+    
 def main() -> None:
     #Sección principal del código
 
@@ -650,7 +673,7 @@ def main() -> None:
                                     opcion = pedirOpcion(OPCIONES)
 
                                 elif opcion == 7:
-                                    pass
+                                    obtener_usuario_mas_ganador()
 
                                     opciones()
                                     opcion = pedirOpcion(OPCIONES)
