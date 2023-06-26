@@ -11,6 +11,7 @@ def imprimirLinea() -> None:
     init(autoreset = True)
     termcolor.cprint ("════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════", "cyan")
 
+
 def opcionesMenu() -> None:
     #Imprime las opciones del menú
 
@@ -21,6 +22,7 @@ def opcionesMenu() -> None:
     print("2. Registrarse")
     print("3. Salir")
     imprimirLinea()
+
 
 def opciones() -> None:
     #Imprime las opciones
@@ -39,15 +41,20 @@ def opciones() -> None:
     print("9. Cerrar sesion")
     imprimirLinea()
 
+
 def pedirOpcion(opciones: list) -> int:
     #Pide una opción al usuario y valida que la misma exista
 
     opcion = input("Elegir opción: ")
+
     while numero_invalido(opcion) or opcion not in opciones:
         opcion = input("Por favor, ingrese una opción válida: ")
+
     opcion = int(opcion)
     imprimirLinea()
+
     return opcion
+
 
 def registrarse() -> None:
     #Permite al usuario registrarse, guardando sus datos en el archivo "usuarios.csv"; donde: Mail,Username,Password,CantidadApostada,FechaUltimaApuesta,DineroDisponible
@@ -57,19 +64,25 @@ def registrarse() -> None:
     username = input("Usuario: ")
     password = input("Contraseña: ")
     hashPassword = sha256_crypt.hash(password)
+    
     with open("usuarios.csv", "a") as f:
         f.write(f"{idUser},{username},{hashPassword}, 0, No se ha realizado ninguna apuesta, 0\n")
+
 
 def obtenerDatos(datos: list) -> list:
     #Toma ciertos datos contenidos en una lista, y los devuelve como un diccionario con una lista para cada usuario
 
-    lista = []
+    x = []
     datosTotales = {}
-    for elemento in datos:
-        lista.append(elemento.split(","))
-    for elemento in lista:
-        datosTotales[elemento[0]] = elemento
+
+    for dato in datos:
+        x.append(dato.split(","))
+
+    for dato in x:
+        datosTotales[dato[0]] = dato
+
     return datosTotales
+
 
 def numero_invalido(numero: str) -> bool:
     #Valida que el valor ingresado sea un número
@@ -77,17 +90,23 @@ def numero_invalido(numero: str) -> bool:
     try:
         float(numero)
         return False
+
     except ValueError:
         return True
+
 
 def id_invalido(id_equipo: str) -> int:
     #Valida que la id de un equipo exista
 
     id_valido = ["434", "435","436","437","438","439","440", "441", "442", "443", "445", "446", "448","449", "450" , "451", "452", "453", "455", "456", "457", "458", "459","460", "474","478", "1024","1025", "2432"]
+
     while id_equipo not in id_valido or numero_invalido(id_equipo):
-        id_equipo = input("ID inválida, por favor intente nuevamente: ")    
+        id_equipo = input("ID inválida, por favor intente nuevamente: ")  
+  
     id_equipo = int(id_equipo)
+
     return id_equipo
+
 
 def validarMail(mail: str) -> str:
     #Valida que el valor ingresado contenga ".com" y "@"
@@ -95,12 +114,17 @@ def validarMail(mail: str) -> str:
     while mail.endswith(".com") != True:
         mail = input("Mail inválido, debe usar \"@\" y terminar con \".com\": ")
         mail.endswith(".com")
+
     mail = list(mail)
+
     while "@" not in mail:
         mail = input("Mail inválido, debe usar \"@\" y terminar con \".com\": ")
         mail = list(mail)
+
     mail = "".join(mail)
+
     return mail
+
 
 def fechaActual() -> str:
     #Define la fecha en la que se llama a la función
@@ -108,8 +132,11 @@ def fechaActual() -> str:
     año = datetime.datetime.now().year
     mes = datetime.datetime.now().month
     dia = datetime.datetime.now().day
+
     fecha = f"{año}" + f"{mes}" + f"{dia}"
+
     return fecha
+
 
 def obtener_plantel_equipo(equipo_id: int) -> None:
     #Crea un archivo .json con los datos del plantel del equipo ingresado
@@ -121,12 +148,12 @@ def obtener_plantel_equipo(equipo_id: int) -> None:
         'x-rapidapi-key': "3acf8ad408e18c67e1da7a3a32ea624b"}
 
     conn.request("GET", f"/players/squads?team={equipo_id}", headers=headers)
-
     res = conn.getresponse()
     data = res.read().decode("utf-8")
 
     with open("plantel_equipo.json", "w") as json_file:
         json_file.write(data)
+
 
 def mostrar_plantel_equipo() -> None:
     #Imprime los datos del plantel del equipo elegido, y luego, elimina el archivo .json para ahorrar espacio
@@ -137,17 +164,21 @@ def mostrar_plantel_equipo() -> None:
     plantel_json = data["response"]
 
     if len(plantel_json) > 0:
+
         for plantel in plantel_json:
             nombreEquipo = plantel['team']['name']
             print(f"+-----+ Plantel del equipo {nombreEquipo} +-----+")
             print("\nNombre | Edad | Posición")
+
             for jugador in plantel['players']:
                 nombreJugador = jugador['name']
                 edadJugador = jugador['age']
                 posicionJugador = jugador['position']
                 print(f"{nombreJugador} | {edadJugador} | {posicionJugador}")
     print()
+
     os.remove("plantel_equipo.json")
+
 
 def imprimir_ids_equipos() -> None:
     #Imprime las ids de cada equipo de la Liga Profesional
@@ -189,11 +220,13 @@ def imprimir_ids_equipos() -> None:
         print(f"{equipo}: {id_equipo}")
     imprimirLinea()
 
+
 def posiciones_temporada() -> None:
     #Imprime las posiciones de la temporada elegida
 
     lista_años = ["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"]
     print("Las temporadas disponibles son: 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022")
+
     año = input("\nIngrese el año para ver la tabla de posiciones: ")
     imprimirLinea()
 
@@ -220,9 +253,12 @@ def posiciones_temporada() -> None:
 
     standings = data['response'][0]['league']['standings']
     imprimirLinea()
+    
     for ranking in standings:
+
         if año in ["2020", "2021", "2022"]:
             print(f"+----+ {ranking[0]['group']} +----+")
+
         for position in ranking:
             rank = position['rank']
             team = position['team']['name']
@@ -230,6 +266,7 @@ def posiciones_temporada() -> None:
             goals_diff = position['goalsDiff']
             print(f"{rank}. {team}, {points} Pts, ({goals_diff})")
         print()
+
 
 def mostrarInfoEquipo(equipoId: int) -> None:
     #Imprime la información del equipo elegido, incluyendo las fotos de su logo y su estadio. Las mismas son eliminadas posteriormente para así ahorrar espacio
@@ -241,7 +278,6 @@ def mostrarInfoEquipo(equipoId: int) -> None:
         'x-rapidapi-key': "3acf8ad408e18c67e1da7a3a32ea624b"}
 
     conn.request("GET", "/teams?league=128&season=2023", headers=headers)
-
     res = conn.getresponse()
     data = res.read().decode("utf-8")
 
@@ -252,7 +288,9 @@ def mostrarInfoEquipo(equipoId: int) -> None:
         data = json.load(json_file)
     
     info_json = data["response"]
+
     for info in info_json:
+
         if info['team']['id'] == equipoId:
             nombreEquipo = info['team']['name']
             codigoEquipo = info['team']['code']
@@ -272,8 +310,10 @@ def mostrarInfoEquipo(equipoId: int) -> None:
             # Mostrar logoEquipo
             print("\nCargando imagen...")
             r = requests.get(logoEquipo)
+
             with open(f'logoEquipo{nombreEquipo}.png', 'wb') as f:
                 f.write(r.content)
+
             imagen = Image.open(f'logoEquipo{nombreEquipo}.png')
             imagen.show()
             os.remove(f'logoEquipo{nombreEquipo}.png')
@@ -285,8 +325,10 @@ def mostrarInfoEquipo(equipoId: int) -> None:
             # Mostrar imagenEstadio
             print("\nCargando imagen...")
             r = requests.get(imagenEstadio)
+
             with open(f'imagenEstadio{nombreEquipo}.png', 'wb') as f:
                 f.write(r.content)
+
             imagen = Image.open(f'imagenEstadio{nombreEquipo}.png')
             imagen.show()
             os.remove(f'imagenEstadio{nombreEquipo}.png')
@@ -295,6 +337,7 @@ def mostrarInfoEquipo(equipoId: int) -> None:
             break
     else:
         print(f"\nNo se encontró información para el equipo con ID {equipoId}")
+
 
 def mostrar_grafico() -> None:
     #Imprime el gráfico del equipo elegido
@@ -310,7 +353,6 @@ def mostrar_grafico() -> None:
         'x-rapidapi-key': "c58299203753a8108c210738ab6b68a5"}
 
     conn.request("GET", f"/teams/statistics?season=2023&team={equipo_id}&league=128", headers=headers)
-
     res = conn.getresponse()
     data = res.read().decode("utf-8")
 
@@ -325,6 +367,7 @@ def mostrar_grafico() -> None:
     minutos = []
 
     for minute_range, minute_info in data_json["response"]["goals"]["for"]["minute"].items():
+
         if minute_info["total"] is not None:
             goles.append(minute_info["total"])
             minutos.append(minute_range)
@@ -336,23 +379,81 @@ def mostrar_grafico() -> None:
     plt.show()
     os.remove(f"equipo_{equipo_id}.json")
 
+
 def cargarDinero(idUser: int, datosTotales: list, monto: float) -> None:
     #Añade dinero a la cuenta del usuario
 
     fechaDeposita = fechaActual()
     for lista in datosTotales.values():
+
         if idUser == lista[0]:
             lista[5] = float(lista[5])
             lista[5] += monto
+
             print("Monto agregado con éxito!")
             os.remove("usuarios.csv")
+
             with open("usuarios.csv", "a") as f:
+
                 for usuario in datosTotales.values():
                     for datos in usuario:
                         f.write(f"{datos},")
                     f.write("\n")
+
             with open("transacciones.csv", "a") as fT:
                 fT.write(f"{idUser},{fechaDeposita},Deposita,{monto}\n")
+
+
+def mayorApostador(datosTotales: list) -> None:
+    #Obtiene el usuario que más apostó y el monto apostado
+
+    montoApostado = 0
+    montoApostado = float(montoApostado)
+
+    for datos in datosTotales.values():
+        datos[3] = float(datos[3])
+
+        if datos[3] > montoApostado:
+            montoApostado = datos[3]
+            user = datos[1]
+
+    return user, montoApostado
+
+
+def obtener_usuario_mas_ganador() -> None:
+    # Obtiene el usuario más ganador a partir del archivo transacciones
+
+    victorias_por_usuario = {}
+
+    try:
+        with open("transacciones.csv", "r") as fT:
+
+            for linea in fT:
+                datos = linea.strip().split(",")
+                idUser = datos[0]
+                resultadoFinal = datos[2]
+
+                if resultadoFinal == "Gana":
+                    if idUser in victorias_por_usuario:
+                        victorias_por_usuario[idUser] += 1
+                    else:
+                        victorias_por_usuario[idUser] = 1
+
+    except FileNotFoundError:
+        print("Ningun usuario ha apostado aún")
+        return None
+
+    try:
+        usuario_mas_ganador = max(victorias_por_usuario, key=victorias_por_usuario.get)
+        cantidad_victorias = victorias_por_usuario[usuario_mas_ganador]
+
+        print(f"El usuario más ganador es: {usuario_mas_ganador}")
+        print(f"Cantidad de victorias: {cantidad_victorias}")
+
+    except ValueError:
+        print("Ningún usuario ha ganado una apuesta aún")
+        return None
+
 
 def tirar_dados() -> int:
     #Función que define el resultado del partido
@@ -365,15 +466,20 @@ def tirar_dados() -> int:
         termcolor.colored("┌───────┐\n│ ●   ● │\n│   ●   │\n│ ●   ● │\n└───────┘", "magenta", attrs=["bold"]),
         termcolor.colored("┌───────┐\n│ ●   ● │\n│ ●   ● │\n│ ●   ● │\n└───────┘", "magenta", attrs=["bold"]),
     ]
+
     respuesta = random.randint(1, 3)
+
     termcolor.cprint("Se están tirando los dados para determinar el ganador...", "cyan")
     termcolor.cprint("☘ ¡Mucha suerte! ☘", "green", attrs=["bold"])
     termcolor.cprint("... El número es ...", "cyan")
     imprimirLinea()
     print(valores_dados[respuesta-1])
+
     termcolor.cprint(f"El número que salió en los dados es {respuesta}", "yellow", attrs=["bold"])
     imprimirLinea()
+
     return respuesta
+
 
 def tirar_dados_2() -> int:
     #Función que define por cuánto se multiplica la apuesta
@@ -386,18 +492,22 @@ def tirar_dados_2() -> int:
         termcolor.colored("┌───────┐\n│ ●   ● │\n│   ●   │\n│ ●   ● │\n└───────┘", "magenta", attrs=["bold"]),
         termcolor.colored("┌───────┐\n│ ●   ● │\n│ ●   ● │\n│ ●   ● │\n└───────┘", "magenta", attrs=["bold"]),
     ]
+
     respuesta = random.randint(1, 4)
+
     termcolor.cprint("Se están tirando los dados para determinar su pago...", "cyan")
     termcolor.cprint("☘ ¡Mucha suerte! ☘", "green", attrs=["bold"])
     termcolor.cprint("... El número es ...", "cyan")
     imprimirLinea()
     print(valores_dados[respuesta-1])
+
     termcolor.cprint(f"El número que salió en los dados es {respuesta}", "yellow", attrs=["bold"])
     imprimirLinea()
+
     return respuesta
 
+
 def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: float) -> None:
-    #...
 
     conn = http.client.HTTPSConnection("v3.football.api-sports.io")
 
@@ -406,7 +516,6 @@ def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: flo
         'x-rapidapi-key': "3acf8ad408e18c67e1da7a3a32ea624b"}
 
     conn.request("GET", "/fixtures?league=128&season=2023", headers=headers)
-
     res = conn.getresponse()
     data = res.read().decode("utf-8")
 
@@ -417,6 +526,7 @@ def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: flo
         json_file = json.load(json_file)
     
     fixtures = []
+
     for elemento in json_file["response"]:
         if elemento["teams"]["home"]["id"] == equipoId or elemento["teams"]["away"]["id"] == equipoId:
             fixtures.append(elemento["fixture"]["id"])
@@ -429,7 +539,7 @@ def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: flo
                 print(f"+---+ ID: {fixture} +---+")
                 print(f"Local: {elemento['teams']['home']['name']}\nVisitante: {elemento['teams']['away']['name']}\n")
     imprimirLinea()
-    
+
     elegirId = input("Elegir ID: ")
     while numero_invalido(elegirId) or int(elegirId) not in fixtures:
         elegirId = input("ID inválida, intente nuevamente: ")
@@ -442,7 +552,6 @@ def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: flo
         'x-rapidapi-key': "3acf8ad408e18c67e1da7a3a32ea624b"}
 
     conn.request("GET", f"/predictions?fixture={elegirId}", headers=headers)
-
     res = conn.getresponse()
     data = res.read().decode("utf-8")
 
@@ -459,17 +568,24 @@ def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: flo
     print(f"Local: {local['name']}\tVisitante: {visitante['name']}")
 
     if elegirId == local["id"] and win_or_draw == True:
-        print(f"\nSi apostas por {local['name']}, se paga el %10 de lo que paga la apuesta")
-        print(f"Si apostas por {visitante['name']}, se paga el %100 de lo que paga la apuesta")
+        print(f"\nSi apostas por {local['name']}, y ganas, se paga el %10 de lo que paga la apuesta")
+        print(f"Si apostas por {visitante['name']}, y ganas, se paga el %100 de lo que paga la apuesta")
+        print("Si apostas por Empate, y ganas, se paga el %5 de lo que paga la apuesta")
+
     elif elegirId == local["id"] and win_or_draw == False:
-        print(f"\nSi apostas por {visitante['name']}, se paga el %10 de lo que paga la apuesta")
-        print(f"Si apostas por {local['name']}, se paga el %100 de lo que paga la apuesta")
+        print(f"\nSi apostas por {visitante['name']}, y ganas, se paga el %10 de lo que paga la apuesta")
+        print(f"Si apostas por {local['name']}, y ganas, se paga el %100 de lo que paga la apuesta")
+        print("Si apostas por Empate, y ganas, se paga el %5 de lo que paga la apuesta")
+
     elif elegirId != local["id"] and win_or_draw == True:
-        print(f"\nSi apostas por {visitante['name']}, se paga el %10 de lo que paga la apuesta")
-        print(f"Si apostas por {local['name']}, se paga el %100 de lo que paga la apuesta")
+        print(f"\nSi apostas por {visitante['name']}, y ganas, se paga el %10 de lo que paga la apuesta")
+        print(f"Si apostas por {local['name']}, y ganas, se paga el %100 de lo que paga la apuesta")
+        print("Si apostas por Empate, y ganas, se paga el %5 de lo que paga la apuesta")
+
     elif elegirId != local["id"] and win_or_draw == False:
-        print(f"\nSi apostas por {local['name']}, se paga el %10 de lo que paga la apuesta")
-        print(f"Si apostas por {visitante['name']}, se paga el %100 de lo que paga la apuesta")
+        print(f"\nSi apostas por {local['name']}, y ganas, se paga el %10 de lo que paga la apuesta")
+        print(f"Si apostas por {visitante['name']}, y ganas, se paga el %100 de lo que paga la apuesta")
+        print("Si apostas por Empate, y ganas, se paga el %5 de lo que paga la apuesta")
 
     posiblesResultados = ["Ganador(L)", "Empate", "Ganador(V)"]
     apostarResultado = input("\nIngrese el resultado esperado para el equipo que eligio /Ganador(L)/Empate/Ganador(V)/: ")
@@ -481,6 +597,7 @@ def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: flo
         apostarMonto = input("\nMonto inválido, intente nuevamente: ")
     apostarMonto = float(apostarMonto)
     print()
+
     if apostarMonto > montoDisponible or apostarMonto <= 0:
         if apostarMonto > montoDisponible:
             print("\nUsted no cuenta con ese monto en su cuenta")
@@ -506,31 +623,38 @@ def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: flo
             paga = apostarMonto + apostarMonto*n*0.1
             resultadoFinal = "Gana"
             print(f"{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
+
         elif apostarResultado == resultado and win_or_draw == False:
             paga = apostarMonto + apostarMonto*n
             resultadoFinal = "Gana"
             print(f"{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
+
         elif apostarResultado != resultado and win_or_draw == True:
             paga = -apostarMonto
             resultadoFinal = "Pierde"
             print(f"Resultado: {resultado}\nSuerte para la próxima!")
+
         elif apostarResultado != resultado and win_or_draw == False:
             paga = -apostarMonto
             resultadoFinal = "Pierde"
             print(f"Resultado: {resultado}\nSuerte para la próxima!")
+
     else:
         if apostarResultado == resultado and win_or_draw == True:
             paga = apostarMonto + apostarMonto*n*0.05
             resultadoFinal = "Gana"
             print(f"{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
+
         elif apostarResultado == resultado and win_or_draw == False:
             paga = apostarMonto + apostarMonto*n
             resultadoFinal = "Gana"
             print(f"{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
+
         elif apostarResultado != resultado and win_or_draw == True:
             paga = -apostarMonto
             resultadoFinal = "Pierde"
             print(f"Resultado: {resultado}\nSuerte para la próxima!")
+
         elif apostarResultado != resultado and win_or_draw == False:
             paga = -apostarMonto
             resultadoFinal = "Pierde"
@@ -545,6 +669,7 @@ def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: flo
             lista[3] = float(lista[3])
             lista[3] += apostarMonto
             os.remove("usuarios.csv")
+
             with open("usuarios.csv", "a") as f:
                 for usuario in datosTotales.values():
                     for datos in usuario:
@@ -618,6 +743,7 @@ def main() -> None:
 
             try:
                 for lista in datosTotales.values():
+
                     if user == lista[1]:
                         if sha256_crypt.verify(password, lista[2]) == True:
                             print(f"\nSe ha iniciado sesion con exito!\nBienvenido {user}")
@@ -677,13 +803,14 @@ def main() -> None:
                                     opcion = pedirOpcion(OPCIONES)
 
                                 elif opcion == 6:
-                                    pass
+                                    user, montoApostado = mayorApostador(datosTotales)
+                                    print(f"El usuario que más apostó fue {user}. Con un total de {montoApostado}!")
 
                                     opciones()
                                     opcion = pedirOpcion(OPCIONES)
 
                                 elif opcion == 7:
-                                    pass
+                                    obtener_usuario_mas_ganador()
 
                                     opciones()
                                     opcion = pedirOpcion(OPCIONES)
