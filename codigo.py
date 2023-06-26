@@ -1,4 +1,4 @@
-import http.client, json, requests, os, random, datetime, termcolor
+import http.client, json, requests, os, random, datetime, termcolor, pyfiglet
 import matplotlib.pyplot as plt
 from passlib.hash import sha256_crypt
 from colorama import init
@@ -25,30 +25,30 @@ def opcionesMenu() -> None:
 
 
 def opciones() -> None:
-    #Imprime las opciones
+    # Imprime las opciones
 
     imprimirLinea()
-    print("+---------------+ Opciones +---------------+")
+    termcolor.cprint("+---------------+ Opciones +---------------+", "magenta")
     imprimirLinea()
-    print("1. Mostrar el plantel completo de un equipo")
-    print("2. Mostrar la tabla de posiciones de la Liga Profesional")
-    print("3. Datos de un equipo")
-    print("4. Gráfico de goles en función de minutos para un equipo")
-    print("5. Cargar dinero")
-    print("6. Usuario que más dinero apostó")
-    print("7. Usuario que más veces ganó")
-    print("8. Apuestas")
-    print("9. Cerrar sesion")
+    termcolor.cprint("1. Mostrar el plantel completo de un equipo", "yellow", attrs=["bold"])
+    termcolor.cprint("2. Mostrar la tabla de posiciones de la Liga Profesional", "yellow", attrs=["bold"])
+    termcolor.cprint("3. Datos de un equipo", "yellow", attrs=["bold"])
+    termcolor.cprint("4. Gráfico de goles en función de minutos para un equipo", "yellow", attrs=["bold"])
+    termcolor.cprint("5. Cargar dinero", "yellow", attrs=["bold"])
+    termcolor.cprint("6. Usuario que más dinero apostó", "yellow", attrs=["bold"])
+    termcolor.cprint("7. Usuario que más veces ganó", "yellow", attrs=["bold"])
+    termcolor.cprint("8. Apuestas", "yellow", attrs=["bold"])
+    termcolor.cprint("9. Cerrar sesión", "white",attrs=["bold"])
     imprimirLinea()
 
 
 def pedirOpcion(opciones: list) -> int:
     #Pide una opción al usuario y valida que la misma exista
 
-    opcion = input("Elegir opción: ")
+    opcion = input(termcolor.colored("Elegir opción: ", attrs=["bold"]))
 
     while numero_invalido(opcion) or opcion not in opciones:
-        opcion = input("Por favor, ingrese una opción válida: ")
+        opcion = input(termcolor.colored("Por favor, ingrese una opción válida: ", "red", attrs=["bold"]))
 
     opcion = int(opcion)
     imprimirLinea()
@@ -59,10 +59,10 @@ def pedirOpcion(opciones: list) -> int:
 def registrarse() -> None:
     #Permite al usuario registrarse, guardando sus datos en el archivo "usuarios.csv"; donde: Mail,Username,Password,CantidadApostada,FechaUltimaApuesta,DineroDisponible
 
-    idUser = input("Mail: ")
+    idUser = input(termcolor.colored("Mail: ", attrs=["bold"]))
     idUser = validarMail(idUser)
-    username = input("Usuario: ")
-    password = input("Contraseña: ")
+     username = input(termcolor.colored("Usuario: ", attrs=["bold"]))
+    password = input(termcolor.colored("Contraseña: ", attrs=["bold"]))
     hashPassword = sha256_crypt.hash(password)
     
     with open("usuarios.csv", "a") as f:
@@ -101,7 +101,7 @@ def id_invalido(id_equipo: str) -> int:
     id_valido = ["434", "435","436","437","438","439","440", "441", "442", "443", "445", "446", "448","449", "450" , "451", "452", "453", "455", "456", "457", "458", "459","460", "474","478", "1024","1025", "2432"]
 
     while id_equipo not in id_valido or numero_invalido(id_equipo):
-        id_equipo = input("ID inválida, por favor intente nuevamente: ")  
+        id_equipo = input(termcolor.colored("ID inválida, por favor intente nuevamente: ", "red", attrs=["bold"])) 
   
     id_equipo = int(id_equipo)
 
@@ -112,13 +112,13 @@ def validarMail(mail: str) -> str:
     #Valida que el valor ingresado contenga ".com" y "@"
 
     while mail.endswith(".com") != True:
-        mail = input("Mail inválido, debe usar \"@\" y terminar con \".com\": ")
+        mail = input(termcolor.colored("Mail inválido, debe usar \"@\" y terminar con \".com\": ", "red", attrs=["bold"]))
         mail.endswith(".com")
 
     mail = list(mail)
 
     while "@" not in mail:
-        mail = input("Mail inválido, debe usar \"@\" y terminar con \".com\": ")
+        mail = input(termcolor.colored("Mail inválido, debe usar \"@\" y terminar con \".com\": ", "red", attrs=["bold"]))
         mail = list(mail)
 
     mail = "".join(mail)
@@ -217,7 +217,9 @@ def imprimir_ids_equipos() -> None:
     imprimirLinea()
 
     for equipo, id_equipo in equipos.items():
-        print(f"{equipo}: {id_equipo}")
+        equipo_coloreado = termcolor.colored(equipo, "magenta")
+        idEquipo_coloreada = termcolor.colored(str(idEquipo), "cyan")
+        print(f"{equipo_coloreado}: {idEquipo_coloreada}")
     imprimirLinea()
 
 
@@ -225,13 +227,13 @@ def posiciones_temporada() -> None:
     #Imprime las posiciones de la temporada elegida
 
     lista_años = ["2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"]
-    print("Las temporadas disponibles son: 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022")
+    termcolor.cprint(termcolor.colored("Las temporadas disponibles son: ", attrs=["bold"]) + ", ".join(termcolor.colored(año, "yellow") for año in lista_años))
 
-    año = input("\nIngrese el año para ver la tabla de posiciones: ")
+    año = input(termcolor.colored("\nIngrese el año para ver la tabla de posiciones: ", attrs=["bold"]))
     imprimirLinea()
 
     while año not in lista_años:
-        año = input("Año inválido, intente nuevamente: ")
+        año = input(termcolor.colored("Año inválido, intente nuevamente: ", "red" ,attrs=["bold"]))
 
     conn = http.client.HTTPSConnection("v3.football.api-sports.io")
 
@@ -255,18 +257,23 @@ def posiciones_temporada() -> None:
     imprimirLinea()
     
     for ranking in standings:
-
+        
         if año in ["2020", "2021", "2022"]:
-            print(f"+----+ {ranking[0]['group']} +----+")
+            print(termcolor.colored(f"+----+ {ranking[0]['group']} +----+", "cyan"))
 
         for position in ranking:
             rank = position['rank']
             team = position['team']['name']
             points = position['points']
             goals_diff = position['goalsDiff']
-            print(f"{rank}. {team}, {points} Pts, ({goals_diff})")
-        print()
 
+            rank_coloreado = termcolor.colored(str(rank), "magenta")
+            team_coloreado = termcolor.colored(team, "cyan")
+            points_coloreados = termcolor.colored(str(points) + " Pts", "yellow")
+            goals_diff_coloreado = termcolor.colored("(" + str(goals_diff) + ")", "white")
+
+            print(f"{rank_coloreado}. {team_coloreado}, {points_coloreados}, {goals_diff_coloreado}")
+        print()
 
 def mostrarInfoEquipo(equipoId: int) -> None:
     #Imprime la información del equipo elegido, incluyendo las fotos de su logo y su estadio. Las mismas son eliminadas posteriormente para así ahorrar espacio
@@ -304,11 +311,11 @@ def mostrarInfoEquipo(equipoId: int) -> None:
             superficieEstadio = info['venue']['surface']
             imagenEstadio = info['venue']['image']
             
-            print(f"+-----+ Información básica sobre el equipo {nombreEquipo} +-----+")
-            print(f"Codigo: {codigoEquipo}\tPaís de origen: {paisEquipo}\tAño de fundación: {fundacionEquipo}")
+            print(termcolor.colored(f"+-----+ Información básica sobre el equipo {nombreEquipo} +-----+", "blue",attrs=["bold"]))
+            print(f"Codigo: {termcolor.colored(codigoEquipo, 'magenta')}\tPaís de origen: {termcolor.colored(paisEquipo, 'cyan')}\tAño de fundación: {termcolor.colored(fundacionEquipo, 'yellow')}")
             
             # Mostrar logoEquipo
-            print("\nCargando imagen...")
+            termcolor.cprint("\nCargando imagen...", "blue")
             r = requests.get(logoEquipo)
 
             with open(f'logoEquipo{nombreEquipo}.png', 'wb') as f:
@@ -318,12 +325,12 @@ def mostrarInfoEquipo(equipoId: int) -> None:
             imagen.show()
             os.remove(f'logoEquipo{nombreEquipo}.png')
             
-            print("\n+-----+ Información sobre su estadio +-----+")
-            print(f"Nombre: {nombreEstadio}\tDirección: {direccionEstadio}")
-            print(f"Ciudad: {ciudadEstadio}\tCapacidad: {capacidadEstadio}\tSuperficie: {superficieEstadio}")
+            termcolor.cprint("\n+-----+ Información sobre su estadio +-----+", "blue",attrs=["bold"]))
+            print(f"Nombre: {termcolor.colored(nombreEstadio, 'magenta')}\tDirección: {termcolor.colored(direccionEstadio, 'cyan')}")
+            print(f"Ciudad: {termcolor.colored(ciudadEstadio, 'yellow')}\tCapacidad: {termcolor.colored(capacidadEstadio, 'magenta')}\tSuperficie: {termcolor.colored(superficieEstadio, 'cyan')}")
             
             # Mostrar imagenEstadio
-            print("\nCargando imagen...")
+            termcolor.cprint("\nCargando imagen...", "blue")
             r = requests.get(imagenEstadio)
 
             with open(f'imagenEstadio{nombreEquipo}.png', 'wb') as f:
@@ -336,14 +343,14 @@ def mostrarInfoEquipo(equipoId: int) -> None:
             
             break
     else:
-        print(f"\nNo se encontró información para el equipo con ID {equipoId}")
+        termcolor.cprint(f"\nNo se encontró información para el equipo con ID {equipoId}", "red", attrs=["bold"])
 
 
 def mostrar_grafico() -> None:
     #Imprime el gráfico del equipo elegido
 
     imprimir_ids_equipos()
-    equipo_id = input("Ingrese el ID del equipo: ")
+    equipo_id = input(termcolor.colored("Ingrese el ID del equipo: ", attrs=["bold"]))
     equipo_id = id_invalido(equipo_id)
     
     conn = http.client.HTTPSConnection("v3.football.api-sports.io")
@@ -440,18 +447,18 @@ def obtener_usuario_mas_ganador() -> None:
                         victorias_por_usuario[idUser] = 1
 
     except FileNotFoundError:
-        print("Ningun usuario ha apostado aún")
+        termcolor.cprint("Ningun usuario ha apostado aún", "red", attrs=["bold"])
         return None
 
     try:
         usuario_mas_ganador = max(victorias_por_usuario, key=victorias_por_usuario.get)
         cantidad_victorias = victorias_por_usuario[usuario_mas_ganador]
 
-        print(f"El usuario más ganador es: {usuario_mas_ganador}")
-        print(f"Cantidad de victorias: {cantidad_victorias}")
+        termcolor.cprint(f"El usuario más ganador es: {usuario_mas_ganador}", "green", attrs=["bold"])
+        termcolor.cprint(f"Cantidad de victorias: {cantidad_victorias}", "cyan", attrs=["bold"])
 
     except ValueError:
-        print("Ningún usuario ha ganado una apuesta aún")
+        termcolor.cprint("Ningún usuario ha ganado una apuesta aún", "red", attrs=["bold"])
         return None
 
 
@@ -506,7 +513,19 @@ def tirar_dados_2() -> int:
 
     return respuesta
 
-
+def imprimir_ganador():
+    texto = "FELICIDADES!"
+    colores = ['yellow', 'green', 'blue', 'magenta', 'cyan', 'red','yellow', 'green', 'blue', 'magenta', 'cyan', 'red']
+    letras_figlet = [pyfiglet.figlet_format(letra) for letra in texto]
+    letras_coloreadas = [' '.join(termcolor.colored(letra.split('\n')[i], color, attrs=['bold']) for letra, color in zip(letras_figlet, colores)) for i in range(len(letras_figlet[0].split('\n')))]
+    texto_combinado = '\n'.join(letras_coloreadas)
+    print(texto_combinado)
+    
+def imprimir_perdedor():
+    texto = pyfiglet.figlet_format("PERDIÓ")
+    mostrar_texto = termcolor.colored(texto, 'red', attrs=['bold'])
+    print(mostrar_texto)   
+    
 def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: float) -> None:
 
     conn = http.client.HTTPSConnection("v3.football.api-sports.io")
@@ -531,7 +550,7 @@ def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: flo
         if elemento["teams"]["home"]["id"] == equipoId or elemento["teams"]["away"]["id"] == equipoId:
             fixtures.append(elemento["fixture"]["id"])
     
-    print("\nElija una ID para ingresar al partido donde desea apostar\n")
+    termcolor.cprint("\nElija una ID para ingresar al partido donde desea apostar\n", attrs=["bold"])
 
     for fixture in fixtures:
         for elemento in json_file["response"]:
@@ -540,9 +559,9 @@ def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: flo
                 print(f"Local: {elemento['teams']['home']['name']}\nVisitante: {elemento['teams']['away']['name']}\n")
     imprimirLinea()
 
-    elegirId = input("Elegir ID: ")
+    elegirId = input(termcolor.colored("Elegir ID: ", attrs=["bold"]))
     while numero_invalido(elegirId) or int(elegirId) not in fixtures:
-        elegirId = input("ID inválida, intente nuevamente: ")
+        elegirId = input(termcolor.colored("ID inválida, intente nuevamente: ", "red", attrs=["bold"]))
     imprimirLinea()
         
     conn = http.client.HTTPSConnection("v3.football.api-sports.io")
@@ -568,44 +587,44 @@ def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: flo
     print(f"Local: {local['name']}\tVisitante: {visitante['name']}")
 
     if elegirId == local["id"] and win_or_draw == True:
-        print(f"\nSi apostas por {local['name']}, y ganas, se paga el %10 de lo que paga la apuesta")
-        print(f"Si apostas por {visitante['name']}, y ganas, se paga el %100 de lo que paga la apuesta")
-        print("Si apostas por Empate, y ganas, se paga el %5 de lo que paga la apuesta")
+        termcolor.cprint(f"\nSi apostas por {local['name']}, y ganas, se paga el %10 de lo que paga la apuesta", "cyan", attrs=["bold"])
+        termcolor.cprint(f"Si apostas por {visitante['name']}, y ganas, se paga el %100 de lo que paga la apuesta", "magenta", attrs=["bold"])
+        termcolor.cprint("Si apostas por Empate, y ganas, se paga el %5 de lo que paga la apuesta", "yellow", attrs=["bold"])
 
     elif elegirId == local["id"] and win_or_draw == False:
-        print(f"\nSi apostas por {visitante['name']}, y ganas, se paga el %10 de lo que paga la apuesta")
-        print(f"Si apostas por {local['name']}, y ganas, se paga el %100 de lo que paga la apuesta")
-        print("Si apostas por Empate, y ganas, se paga el %5 de lo que paga la apuesta")
+        termcolor.cprint(f"\nSi apostas por {visitante['name']}, y ganas, se paga el %10 de lo que paga la apuesta", "cyan", attrs=["bold"])
+        termcolor.cprint(f"Si apostas por {local['name']}, y ganas, se paga el %100 de lo que paga la apuesta", "magenta", attrs=["bold"])
+        termcolor.cprint("Si apostas por Empate, y ganas, se paga el %5 de lo que paga la apuesta", "yellow", attrs=["bold"])
 
     elif elegirId != local["id"] and win_or_draw == True:
-        print(f"\nSi apostas por {visitante['name']}, y ganas, se paga el %10 de lo que paga la apuesta")
-        print(f"Si apostas por {local['name']}, y ganas, se paga el %100 de lo que paga la apuesta")
-        print("Si apostas por Empate, y ganas, se paga el %5 de lo que paga la apuesta")
+        termcolor.cprint(f"\nSi apostas por {visitante['name']}, y ganas, se paga el %10 de lo que paga la apuesta", "cyan", attrs=["bold"])
+        termcolor.cprint(f"Si apostas por {local['name']}, y ganas, se paga el %100 de lo que paga la apuesta", "magenta", attrs=["bold"])
+        termcolor.cprint("Si apostas por Empate, y ganas, se paga el %5 de lo que paga la apuesta", "yellow", attrs=["bold"])
 
     elif elegirId != local["id"] and win_or_draw == False:
-        print(f"\nSi apostas por {local['name']}, y ganas, se paga el %10 de lo que paga la apuesta")
-        print(f"Si apostas por {visitante['name']}, y ganas, se paga el %100 de lo que paga la apuesta")
-        print("Si apostas por Empate, y ganas, se paga el %5 de lo que paga la apuesta")
+        termcolor.cprint(f"\nSi apostas por {local['name']}, y ganas, se paga el %10 de lo que paga la apuesta", "cyan", attrs=["bold"])
+        termcolor.cprint(f"Si apostas por {visitante['name']}, y ganas, se paga el %100 de lo que paga la apuesta", "magenta", attrs=["bold"])
+        termcolor.cprint("Si apostas por Empate, y ganas, se paga el %5 de lo que paga la apuesta", "yellow", attrs=["bold"])
 
     posiblesResultados = ["Ganador(L)", "Empate", "Ganador(V)"]
-    apostarResultado = input("\nIngrese el resultado esperado para el equipo que eligio /Ganador(L)/Empate/Ganador(V)/: ")
+    apostarResultado = input(termcolor.colored("\nIngrese el resultado esperado para el equipo que eligio /Ganador(L)/Empate/Ganador(V)/: ", attrs=["bold"]))
     if apostarResultado not in posiblesResultados:
-        apostarResultado = input("Resultado inválido, intente nuevamente /Ganador(L)/Empate/Ganador(V)/: ")
+        apostarResultado = input(termcolor.colored("Resultado inválido, intente nuevamente /Ganador(L)/Empate/Ganador(V)/: ", "red", attrs=["bold"]))
 
-    apostarMonto = input("\nIngrese el monto que desea apostar: ")
+    apostarMonto = input(termcolor.colored("\nIngrese el monto que desea apostar: ", attrs=["bold"]))
     while numero_invalido(apostarMonto):
-        apostarMonto = input("\nMonto inválido, intente nuevamente: ")
+        apostarMonto = input(termcolor.colored("\nMonto inválido, intente nuevamente: ", "red"))
     apostarMonto = float(apostarMonto)
     print()
 
     if apostarMonto > montoDisponible or apostarMonto <= 0:
         if apostarMonto > montoDisponible:
-            print("\nUsted no cuenta con ese monto en su cuenta")
+            termcolor.cprint("\nUsted no cuenta con ese monto en su cuenta", "red")
             os.remove(f"fixture_{elegirId}.json")
             os.remove("fixtures.json")
             return None
         else:
-            print("\nEse monto no es posible de apostar")
+            termcolor.cprint("\nEse monto no es posible de apostar", "red")
             return None
 
     dado = tirar_dados()
@@ -622,43 +641,58 @@ def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: flo
         if apostarResultado == resultado and win_or_draw == True:
             paga = apostarMonto + apostarMonto*n*0.1
             resultadoFinal = "Gana"
-            print(f"{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
+            imprimir_ganador()
+            termcolor.cprint(f"{resultado}!\nFelicitaciones!\nHa ganado: {paga}", "green", attrs=["bold"])
 
         elif apostarResultado == resultado and win_or_draw == False:
             paga = apostarMonto + apostarMonto*n
             resultadoFinal = "Gana"
-            print(f"{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
+            imprimir_ganador()
+            imprimirLinea()
+            termcolor.cprint(f"{resultado}!\nFelicitaciones!\nHa ganado: {paga}", "green", attrs=["bold"])
 
         elif apostarResultado != resultado and win_or_draw == True:
             paga = -apostarMonto
             resultadoFinal = "Pierde"
-            print(f"Resultado: {resultado}\nSuerte para la próxima!")
+            imprimir_perdedor()
+            imprimirLinea()
+            termcolor.cprint(f"Resultado: {resultado}\nSuerte para la próxima! ☘", "red", attrs=["bold"])
 
         elif apostarResultado != resultado and win_or_draw == False:
             paga = -apostarMonto
             resultadoFinal = "Pierde"
-            print(f"Resultado: {resultado}\nSuerte para la próxima!")
+            imprimir_perdedor()
+            imprimirLinea()
+            termcolor.cprint(f"Resultado: {resultado}\nSuerte para la próxima! ☘", "red", attrs=["bold"])
 
     else:
         if apostarResultado == resultado and win_or_draw == True:
             paga = apostarMonto + apostarMonto*n*0.05
             resultadoFinal = "Gana"
-            print(f"{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
+            imprimir_ganador()
+            imprimirLinea()
+            termcolor.cprint(f"{resultado}!\nFelicitaciones!\nHa ganado: {paga}", "green", attrs=["bold"])
 
         elif apostarResultado == resultado and win_or_draw == False:
             paga = apostarMonto + apostarMonto*n
             resultadoFinal = "Gana"
-            print(f"{resultado}!\nFelicitaciones!\nHa ganado: {paga}")
+            imprimir_ganador()
+            imprimirLinea()
+            termcolor.cprint(f"{resultado}!\nFelicitaciones!\nHa ganado: {paga}", "green", attrs=["bold"])
 
         elif apostarResultado != resultado and win_or_draw == True:
             paga = -apostarMonto
             resultadoFinal = "Pierde"
-            print(f"Resultado: {resultado}\nSuerte para la próxima!")
+            imprimir_perdedor()
+            imprimirLinea()
+            termcolor.cprint(f"Resultado: {resultado}\nSuerte para la próxima! ☘", "red", attrs=["bold"])
 
         elif apostarResultado != resultado and win_or_draw == False:
             paga = -apostarMonto
             resultadoFinal = "Pierde"
-            print(f"Resultado: {resultado}\nSuerte para la próxima!")
+            imprimir_perdedor()
+            imprimirLinea()
+            termcolor.cprint(f"Resultado: {resultado}\nSuerte para la próxima! ☘", "red", attrs=["bold"])
 
     fechaApuesta = fechaActual()
     for lista in datosTotales.values():
@@ -682,37 +716,7 @@ def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: flo
     os.remove(f"fixture_{elegirId}.json")
     os.remove("fixtures.json")
 
-def obtener_usuario_mas_ganador() -> None:
-    # Obtiene usuario más ganador a partir del archivo transacciones.
-    victorias_por_usuario = {}
 
-    with open("transacciones.csv", "r") as fT:
-        for linea in fT:
-            datos = linea.strip().split(",")
-            idUser = int(datos[0])
-            resultadoFinal = datos[2]
-
-            if resultadoFinal == "Gana":
-                if idUser in victorias_por_usuario:
-                    victorias_por_usuario[idUser] += 1
-                else:
-                    victorias_por_usuario[idUser] = 1
-
-    
-    if not victorias_por_usuario:
-        print("No se encontraron usuarios que hayan apostado.")
-        return
-
-   
-    if not any(resultado == "Gana" for resultado in victorias_por_usuario.values()):
-        print("No hubo ganadores entre los usuarios.")
-        return
-
-    usuario_mas_ganador = max(victorias_por_usuario, key=victorias_por_usuario.get)
-    cantidad_victorias = victorias_por_usuario[usuario_mas_ganador]
-
-    print(f"El usuario más ganador es: {usuario_mas_ganador}")
-    print(f"Cantidad de victorias: {cantidad_victorias}")
 
 
 def main() -> None:
@@ -727,8 +731,8 @@ def main() -> None:
     while opcionMenu != 3:
 
         if opcionMenu == 1:
-            user = input("Usuario: ")
-            password = input("Contraseña: ")
+            user = input(termcolor.colored("Usuario: "),  attrs=["bold"])
+            password = input(termcolor.colored("Contraseña: ", attrs=["bold"]))
 
             try:
                 with open("usuarios.csv", "r") as f:
@@ -736,7 +740,7 @@ def main() -> None:
                 datosTotales = obtenerDatos(datos)
 
             except FileNotFoundError:
-                print("\nEste usuario no se ha registrado")
+                termcolor.cprint("\nEste usuario no se ha registrado", "red",  attrs=["bold"])
 
                 opcionesMenu()
                 opcionMenu = pedirOpcion(OPCIONESMENU)
@@ -746,7 +750,7 @@ def main() -> None:
 
                     if user == lista[1]:
                         if sha256_crypt.verify(password, lista[2]) == True:
-                            print(f"\nSe ha iniciado sesion con exito!\nBienvenido {user}")
+                            termcolor.cprint(f"\nSe ha iniciado sesion con exito!\nBienvenido {user}", "cyan" ,attrs=["bold"])
 
                             opciones()
                             opcion = pedirOpcion(OPCIONES)
@@ -756,7 +760,9 @@ def main() -> None:
                                 if opcion == 1:
                                     imprimir_ids_equipos()
 
-                                    equipo_id = input("Ingrese el ID del equipo para ver el plantel: ")
+                                    equipo_id = input(termcolor.colored("Ingrese el ", attrs=["bold"]) + termcolor.colored("ID", "cyan", attrs=["bold"]) + termcolor.colored(" del equipo para ver el plantel: ", attrs=["bold"]))
+                                    
+        
                                     equipo_id = id_invalido(equipo_id)
 
                                     print()
@@ -775,7 +781,7 @@ def main() -> None:
                                 elif opcion == 3:
                                     imprimir_ids_equipos()
 
-                                    equipoId = input("Ingrese el ID del equipo para ver su información: ")
+                                    equipoId =  input(termcolor.colored("Ingrese el ", attrs=["bold"]) + termcolor.colored("ID", "cyan", attrs=["bold"]) + termcolor.colored(" del equipo para ver su información: ", attrs=["bold"]))
                                     equipoId = id_invalido(equipoId)
 
                                     print()
@@ -791,9 +797,9 @@ def main() -> None:
                                     opcion = pedirOpcion(OPCIONES)
 
                                 elif opcion == 5:
-                                    monto = input("Ingrese el monto que desea agregar: ")
+                                    monto = input(termcolor.colored("Ingrese el monto que desea agregar: ", attrs=["bold"]))
                                     while numero_invalido(monto):
-                                        monto = input("Monto inválido, intente nuevamente: ")
+                                        monto = input(termcolor.colored("Monto inválido, intente nuevamente: ", "red", attrs=["bold"]))
                                     monto = float(monto)
 
                                     print()
@@ -804,7 +810,7 @@ def main() -> None:
 
                                 elif opcion == 6:
                                     user, montoApostado = mayorApostador(datosTotales)
-                                    print(f"El usuario que más apostó fue {user}. Con un total de {montoApostado}!")
+                                    termcolor.cprint(f"El usuario que más apostó fue {user}. Con un total de {montoApostado}!", "cyan", attrs=["bold"])
 
                                     opciones()
                                     opcion = pedirOpcion(OPCIONES)
@@ -818,7 +824,8 @@ def main() -> None:
                                 elif opcion == 8:
                                     imprimir_ids_equipos()
 
-                                    equipoId = input("Ingrese el ID del equipo: ")
+                                    equipoId = input(termcolor.colored("Ingrese el ", attrs=["bold"]) + termcolor.colored("ID", "cyan", attrs=["bold"]) + termcolor.colored(" del equipo: ", attrs=["bold"]))
+                                    
                                     equipoId = id_invalido(equipoId)
 
                                     lista[5] = float(lista[5])
@@ -832,24 +839,24 @@ def main() -> None:
                                 opcionMenu = pedirOpcion(OPCIONESMENU)
                                 break
                         else:
-                            print("\nLa contraseña es incorrecta")
+                            termcolor.cprint("\nLa contraseña es incorrecta", "red", attrs=["bold"])
 
                             opcionesMenu()
                             opcionMenu = pedirOpcion(OPCIONESMENU)
                             break
                 else:
-                    print("\nEste usuario no se ha registrado")
+                    termcolor.cprint("\nEste usuario no se ha registrado", "red", attrs=["bold"])
 
                     opcionesMenu()
                     opcionMenu = pedirOpcion(OPCIONESMENU)
 
             except UnboundLocalError:
-                print("Por favor reinicie la página para continuar")
+                termcolor.cprint("Por favor reinicie la página para continuar", "blue", attrs=["bold"])
                 return None
 
         elif opcionMenu == 2:
             registrarse()
-            print("\nSe ha registrado con éxito!")
+            termcolor.cprint("\nSe ha registrado con éxito!", "green", attrs=["bold"])
 
             opcionesMenu()
             opcionMenu = pedirOpcion(OPCIONESMENU)
