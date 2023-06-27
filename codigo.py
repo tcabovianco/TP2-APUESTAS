@@ -61,7 +61,7 @@ def registrarse() -> None:
 
     idUser = input(termcolor.colored("Mail: ", attrs=["bold"]))
     idUser = validarMail(idUser)
-     username = input(termcolor.colored("Usuario: ", attrs=["bold"]))
+    username = input(termcolor.colored("Usuario: ", attrs=["bold"]))
     password = input(termcolor.colored("Contraseña: ", attrs=["bold"]))
     hashPassword = sha256_crypt.hash(password)
     
@@ -79,7 +79,8 @@ def obtenerDatos(datos: list) -> list:
         x.append(dato.split(","))
 
     for dato in x:
-        datosTotales[dato[0]] = dato
+        if dato[0] != "":
+            datosTotales[dato[0]] = dato
 
     return datosTotales
 
@@ -216,7 +217,7 @@ def imprimir_ids_equipos() -> None:
     print("A continuación se muestran los equipos y sus respectivas IDs")
     imprimirLinea()
 
-    for equipo, id_equipo in equipos.items():
+    for equipo, idEquipo in equipos.items():
         equipo_coloreado = termcolor.colored(equipo, "magenta")
         idEquipo_coloreada = termcolor.colored(str(idEquipo), "cyan")
         print(f"{equipo_coloreado}: {idEquipo_coloreada}")
@@ -239,7 +240,7 @@ def posiciones_temporada() -> None:
 
     headers = {
         'x-rapidapi-host': "v3.football.api-sports.io",
-        'x-rapidapi-key': "c58299203753a8108c210738ab6b68a5"}
+        'x-rapidapi-key': "3acf8ad408e18c67e1da7a3a32ea624b"}
 
     conn.request("GET", f"/standings?league=128&season={año}", headers=headers)
     res = conn.getresponse()
@@ -323,9 +324,8 @@ def mostrarInfoEquipo(equipoId: int) -> None:
 
             imagen = Image.open(f'logoEquipo{nombreEquipo}.png')
             imagen.show()
-            os.remove(f'logoEquipo{nombreEquipo}.png')
             
-            termcolor.cprint("\n+-----+ Información sobre su estadio +-----+", "blue",attrs=["bold"]))
+            termcolor.cprint("\n+-----+ Información sobre su estadio +-----+", "blue",attrs=["bold"])
             print(f"Nombre: {termcolor.colored(nombreEstadio, 'magenta')}\tDirección: {termcolor.colored(direccionEstadio, 'cyan')}")
             print(f"Ciudad: {termcolor.colored(ciudadEstadio, 'yellow')}\tCapacidad: {termcolor.colored(capacidadEstadio, 'magenta')}\tSuperficie: {termcolor.colored(superficieEstadio, 'cyan')}")
             
@@ -338,8 +338,9 @@ def mostrarInfoEquipo(equipoId: int) -> None:
 
             imagen = Image.open(f'imagenEstadio{nombreEquipo}.png')
             imagen.show()
-            os.remove(f'imagenEstadio{nombreEquipo}.png')
             os.remove("info_equipos.json")
+            os.remove(f'logoEquipo{nombreEquipo}.png')
+            os.remove(f'imagenEstadio{nombreEquipo}.png')
             
             break
     else:
@@ -357,7 +358,7 @@ def mostrar_grafico() -> None:
 
     headers = {
         'x-rapidapi-host': "v3.football.api-sports.io",
-        'x-rapidapi-key': "c58299203753a8108c210738ab6b68a5"}
+        'x-rapidapi-key': "3acf8ad408e18c67e1da7a3a32ea624b"}
 
     conn.request("GET", f"/teams/statistics?season=2023&team={equipo_id}&league=128", headers=headers)
     res = conn.getresponse()
@@ -416,7 +417,7 @@ def mayorApostador(datosTotales: list) -> None:
 
     montoApostado = 0
     montoApostado = float(montoApostado)
-
+    
     for datos in datosTotales.values():
         datos[3] = float(datos[3])
 
@@ -424,7 +425,7 @@ def mayorApostador(datosTotales: list) -> None:
             montoApostado = datos[3]
             user = datos[1]
 
-    return user, montoApostado
+    return [user, montoApostado]
 
 
 def obtener_usuario_mas_ganador() -> None:
@@ -513,6 +514,7 @@ def tirar_dados_2() -> int:
 
     return respuesta
 
+
 def imprimir_ganador():
     texto = "FELICIDADES!"
     colores = ['yellow', 'green', 'blue', 'magenta', 'cyan', 'red','yellow', 'green', 'blue', 'magenta', 'cyan', 'red']
@@ -520,12 +522,14 @@ def imprimir_ganador():
     letras_coloreadas = [' '.join(termcolor.colored(letra.split('\n')[i], color, attrs=['bold']) for letra, color in zip(letras_figlet, colores)) for i in range(len(letras_figlet[0].split('\n')))]
     texto_combinado = '\n'.join(letras_coloreadas)
     print(texto_combinado)
-    
+
+
 def imprimir_perdedor():
     texto = pyfiglet.figlet_format("PERDIÓ")
     mostrar_texto = termcolor.colored(texto, 'red', attrs=['bold'])
     print(mostrar_texto)   
-    
+
+
 def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: float) -> None:
 
     conn = http.client.HTTPSConnection("v3.football.api-sports.io")
@@ -717,8 +721,6 @@ def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: flo
     os.remove("fixtures.json")
 
 
-
-
 def main() -> None:
     #Sección principal del código
 
@@ -731,7 +733,7 @@ def main() -> None:
     while opcionMenu != 3:
 
         if opcionMenu == 1:
-            user = input(termcolor.colored("Usuario: "),  attrs=["bold"])
+            user = input(termcolor.colored("Usuario: ",  attrs=["bold"]))
             password = input(termcolor.colored("Contraseña: ", attrs=["bold"]))
 
             try:
@@ -809,8 +811,12 @@ def main() -> None:
                                     opcion = pedirOpcion(OPCIONES)
 
                                 elif opcion == 6:
-                                    user, montoApostado = mayorApostador(datosTotales)
-                                    termcolor.cprint(f"El usuario que más apostó fue {user}. Con un total de {montoApostado}!", "cyan", attrs=["bold"])
+                                    try:
+                                        user, montoApostado = mayorApostador(datosTotales)
+                                        termcolor.cprint(f"El usuario que más apostó fue {user}. Con un total de {montoApostado}!", "cyan", attrs=["bold"])
+
+                                    except UnboundLocalError:
+                                        termcolor.cprint("Aún no se ha realizado ninguna apuesta", "red", attrs=["bold"])
 
                                     opciones()
                                     opcion = pedirOpcion(OPCIONES)
