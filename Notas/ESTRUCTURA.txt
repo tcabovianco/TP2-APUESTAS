@@ -41,11 +41,11 @@ Podríamos también utilizar Matplotlib para realizar el gráfico.
 
 ‣ ÍTEM 7:
 
-- Mostrar el usuario que más dinero apostó ❌
+- Mostrar el usuario que más dinero apostó ✅
 
 ‣ ÍTEM 8:
 
-- Mostrar el usuario que más veces ganó ❌
+- Mostrar el usuario que más veces ganó ✅
 
 ‣ ÍTEM 9:
 - Registrar apuestas o ingresos de dineros en archivo CSV, "transacciones.csv" ✅
