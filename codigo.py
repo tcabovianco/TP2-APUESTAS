@@ -388,7 +388,7 @@ def mostrar_grafico() -> None:
     os.remove(f"equipo_{equipo_id}.json")
 
 
-def cargarDinero(idUser: int, datosTotales: list, monto: float) -> None:
+def cargarDinero(idUser: int, datosTotales: dict, monto: float) -> None:
     #Añade dinero a la cuenta del usuario
 
     fechaDeposita = fechaActual()
@@ -412,7 +412,7 @@ def cargarDinero(idUser: int, datosTotales: list, monto: float) -> None:
                 fT.write(f"{idUser},{fechaDeposita},Deposita,{monto}\n")
 
 
-def mayorApostador(datosTotales: list) -> None:
+def mayorApostador(datosTotales: dict) -> list:
     #Obtiene el usuario que más apostó y el monto apostado
 
     montoApostado = 0
@@ -530,7 +530,7 @@ def imprimir_perdedor():
     print(mostrar_texto)   
 
 
-def apostar(equipoId: int, idUser: int, datosTotales: list, montoDisponible: float) -> None:
+def apostar(equipoId: int, idUser: int, datosTotales: dict, montoDisponible: float) -> None:
 
     conn = http.client.HTTPSConnection("v3.football.api-sports.io")
 
