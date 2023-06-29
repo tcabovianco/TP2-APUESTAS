@@ -532,7 +532,7 @@ def imprimir_ganador():
 
 
 def imprimir_perdedor():
-    texto = pyfiglet.figlet_format("PERDIÓ")
+    texto = pyfiglet.figlet_format("PERDIO")
     mostrar_texto = termcolor.colored(texto, 'red', attrs=['bold'])
     print(mostrar_texto)   
 
