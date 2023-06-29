@@ -253,10 +253,10 @@ def posiciones_temporada() -> None:
 
     archivo = f"posicion {año}.json"
 
-    with open(f"Tabla de posiciones/{archivo}", 'wb') as json_file:
+    with open(f"{archivo}", 'wb') as json_file:
         json_file.write(data)
 
-    with open(f"Tabla de posiciones/{archivo}", 'r') as json_file:
+    with open(f"{archivo}", 'r') as json_file:
         data = json.load(json_file)
 
     standings = data['response'][0]['league']['standings']
@@ -280,6 +280,8 @@ def posiciones_temporada() -> None:
 
             print(f"{rank_coloreado}. {team_coloreado}, {points_coloreados}, {goals_diff_coloreado}")
         print()
+        
+    os.remove (archivo)
 
 def mostrarInfoEquipo(equipoId: int) -> None:
     #Imprime la información del equipo elegido, incluyendo las fotos de su logo y su estadio. Las mismas son eliminadas posteriormente para así ahorrar espacio
