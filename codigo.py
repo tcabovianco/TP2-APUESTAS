@@ -16,11 +16,11 @@ def opcionesMenu() -> None:
     #Imprime las opciones del menú
 
     imprimirLinea()
-    print("+---------------+ Menú +---------------+")
+    termcolor.cprint("+---------------+ Menú +---------------+", "magenta")
     imprimirLinea()
-    print("1. Iniciar sesión")
-    print("2. Registrarse")
-    print("3. Salir")
+    termcolor.cprint("1. Iniciar sesión", attrs=["bold"])
+    termcolor.cprint("2. Registrarse", attrs=["bold"])
+    termcolor.cprint("3. Salir", attrs=["bold"])
     imprimirLinea()
 
 
@@ -168,14 +168,19 @@ def mostrar_plantel_equipo() -> None:
 
         for plantel in plantel_json:
             nombreEquipo = plantel['team']['name']
-            print(f"+-----+ Plantel del equipo {nombreEquipo} +-----+")
-            print("\nNombre | Edad | Posición")
+            termcolor.cprint(f"+-----+ Plantel del equipo {nombreEquipo} +-----+", "blue")
+            print()
+            termcolor.cprint("Nombre", "cyan", end=" | ")
+            termcolor.cprint("Edad", "magenta", end=" | ")
+            termcolor.cprint("Posición", "yellow")
+            print()
 
             for jugador in plantel['players']:
                 nombreJugador = jugador['name']
                 edadJugador = jugador['age']
                 posicionJugador = jugador['position']
-                print(f"{nombreJugador} | {edadJugador} | {posicionJugador}")
+                datosJugador = termcolor.colored(nombreJugador, "cyan") + " | " + termcolor.colored(str(edadJugador), "magenta") + " | " + termcolor.colored(posicionJugador, "yellow")
+                print(datosJugador)
     print()
 
     os.remove("plantel_equipo.json")
